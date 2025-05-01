@@ -1,5 +1,6 @@
 package com.enspy.webtree.services;
 
+import com.enspy.webtree.models.Family;
 import com.enspy.webtree.models.Users;
 import com.enspy.webtree.repositories.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -36,7 +37,7 @@ public class JWTService {
                 "userId", user.getId() + "",
                 Claims.EXPIRATION, new Date(expiration),
                 Claims.SUBJECT, user.getUsername());
-        // System.out.println("LEs roles sont : "+user.getAuthorities());
+
         String bearer = Jwts.builder()
                 .claims(claims)
                 .subject(user.getUsername())
@@ -44,25 +45,45 @@ public class JWTService {
                 .expiration(new Date(expiration))
                 .signWith(getKey())
                 .compact();
-        // Generation du refresh token
-        final Map<String, Object> refreshClaims = Map.of(
-                "userid", user.getId(),
-                Claims.EXPIRATION, new Date(expiration + 60 * 1000),
-                Claims.SUBJECT, user.getUsername());
-        String refreshToken = Jwts.builder()
-                .claims(refreshClaims)
-                .subject(user.getUsername())
+
+
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("Bearer", bearer);
+        map.put("ExpireAt", new Date(expiration));
+
+        return map;
+
+    }
+
+
+    public Map<String, Object> generateFamilyToken(Family family) {
+        final long currenttime = System.currentTimeMillis();
+        long expiration = 0;
+
+        expiration = currenttime + 30 * 60 * 1000;// Un token de 30 min
+
+        final Map<String, Object> claims = Map.of(
+                "hashId", "",
+                "familyName", family.getFamilyName(),
+                "userId", family.getId() + "",
+                Claims.EXPIRATION, new Date(expiration),
+                Claims.SUBJECT, family.getId());
+
+        String bearer = Jwts.builder()
+                .claims(claims)
+                .subject(family.getId())
                 .issuedAt(new Date(currenttime))
-                .expiration(new Date(expiration + 60 * 1000))
+                .expiration(new Date(expiration))
                 .signWith(getKey())
                 .compact();
 
         Map<String, Object> map = new HashMap<>();
         map.put("Bearer", bearer);
         map.put("ExpireAt", new Date(expiration));
-        map.put("RefreshToken", refreshToken);
+
         return map;
-        // return Map.of("Bearer",bearer,"ExpireAt",new Date(expiration));
+
     }
 
     private Key getKey() {
