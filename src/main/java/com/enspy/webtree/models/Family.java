@@ -20,7 +20,11 @@ public class Family {
     private String id;
 
     @JsonManagedReference("members")
-    @JsonBackReference("families")
-    @ManyToMany(mappedBy = "members")
+    @ManyToMany
+    @JoinTable(
+            name = "user_family",
+            joinColumns = @JoinColumn(name = "family_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private List<Users> members;
 }
