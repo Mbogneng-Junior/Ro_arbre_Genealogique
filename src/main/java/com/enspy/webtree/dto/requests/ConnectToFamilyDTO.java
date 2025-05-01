@@ -1,6 +1,5 @@
 package com.enspy.webtree.dto.requests;
 
-
 import lombok.*;
 
 import java.util.UUID;
@@ -10,12 +9,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateUserDto {
+public class ConnectToFamilyDTO {
     private String username;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private java.sql.Date dateOfBirth;
     private UUID familyId;
 }
