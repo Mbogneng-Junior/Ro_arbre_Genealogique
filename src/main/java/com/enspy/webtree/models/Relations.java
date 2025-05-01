@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
+import java.util.UUID;
+
 @Builder
 @Getter
 @Setter
@@ -16,5 +18,11 @@ import lombok.*;
 public class Relations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    String id;
+    UUID id;
+
+    private UUID targetId;
+    private UUID sourcesId;
+    private int poid;
+
+
 }
