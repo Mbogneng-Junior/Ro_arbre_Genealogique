@@ -1,10 +1,8 @@
 package com.enspy.webtree.models;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
@@ -20,8 +18,12 @@ public class Relations {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     UUID id;
 
-    private UUID targetId;
-    private UUID sourcesId;
+
+    @ManyToOne @JoinColumn(name = "target_id")
+    private Users target;
+
+    @ManyToOne @JoinColumn(name = "source_id")
+    private Users sources;
     private int poid;
 
 

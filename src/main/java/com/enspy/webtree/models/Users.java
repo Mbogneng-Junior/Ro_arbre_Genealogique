@@ -1,12 +1,14 @@
 package com.enspy.webtree.models;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -23,6 +25,14 @@ public class Users implements UserDetails {
     private String FirstName;
     private String LastName;
     private String username;
+
+    @JsonBackReference("members")
+    @ManyToMany(mappedBy = "families")
+    private List <Family> families;
+
+    @JsonBackReference("sources")
+    @OneToMany()
+    private List <Relations> listeAdjacence;
 
 
 
