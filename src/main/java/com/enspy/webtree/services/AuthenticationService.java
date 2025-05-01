@@ -107,6 +107,11 @@ public class AuthenticationService {
             return response;
         }
         Users user = userOpt.get();
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            response.setValue("401");
+            response.setText("invalid password");
+            return response;
+        }
 
         return generateToken(user);
     }

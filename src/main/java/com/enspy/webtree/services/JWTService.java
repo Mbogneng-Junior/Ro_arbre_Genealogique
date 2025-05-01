@@ -72,7 +72,7 @@ public class JWTService {
 
         String bearer = Jwts.builder()
                 .claims(claims)
-                .subject(family.getId())
+                .subject(family.getFamilyName())
                 .issuedAt(new Date(currenttime))
                 .expiration(new Date(expiration))
                 .signWith(getKey())
