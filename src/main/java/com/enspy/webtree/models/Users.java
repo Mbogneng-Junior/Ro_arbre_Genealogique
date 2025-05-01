@@ -22,8 +22,9 @@ public class Users implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String FirstName;
-    private String LastName;
+    private String firstName;
+    private String lastName;
+    private java.sql.Date dateOfBirth;
     private String username;
 
     @JsonBackReference("members")
