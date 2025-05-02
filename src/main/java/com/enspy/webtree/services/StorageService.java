@@ -109,7 +109,7 @@ public class StorageService {
     }
 
 
-    /*public ApiResponse UploadMultipleFile(String username, MultipartFile[] files) {
+    public ApiResponse UploadMultipleFile(String username, MultipartFile[] files) {
 
         Map<String, Object> map = new HashMap<>();
         ApiResponse apiError = new ApiResponse();
@@ -117,14 +117,14 @@ public class StorageService {
             Arrays.stream(files).forEach((file) -> {
                 this.deleteSingleFile(username);
                 this.save(file, username);
-                com.gloswitch.user_service.dto.File uploaded = new com.gloswitch.user_service.dto.File();
+                com.enspy.webtree.dto.requests.File uploaded = new com.enspy.webtree.dto.requests.File();
                 uploaded.setFilename(file.getOriginalFilename());
                 uploaded.setContent(file.getContentType());
                 uploaded.setSize(file.getSize());
                 map.put(file.getOriginalFilename(), uploaded);
             });
         }
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<Users> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             apiError.setText("Account not found");
             apiError.setValue("404");
@@ -134,11 +134,8 @@ public class StorageService {
             apiError.setValue("200");
             apiError.setData(map);
         }
-
-        ApiError updateKycStatus  = verifyAllFileKYCIsPresent(username);
         return apiError;
     }
-*/
 
 
 }
