@@ -47,9 +47,21 @@ export default function RegistrationForm() {
         })
     }
 
+    const [errorMessage, setErrorMessage] = useState<string>("");
+
     function nextStep ():void
         {
-        setStep(step + 1);
+            if (formData.firstName && formData.lastName && formData.email  && formData.password)
+            {
+                setErrorMessage("");
+                setStep(step + 1);
+            }
+            else {
+                setErrorMessage("veuillez remplir tous les champs");
+             //   alert("veuillez remplir tous les champs");
+            }
+
+
     }
 
     function prevStep ():void
@@ -61,32 +73,22 @@ export default function RegistrationForm() {
         e.preventDefault();
         console.log("Form submitted:", formData);
         console.log("Family form submitted:", familyForm);
-
         try {
-            const response: AxiosResponse<AxiosRegistrationResponse> = await axios.post(
-                "http://localhost:8019/api/register",
-                formData
-            );
-
+            const response: AxiosResponse<AxiosRegistrationResponse> = await axios.post("http://localhost:8019/api/register", formData);
             let familySuccess = true;
-
-            if (createFamily) {
-                const familyResponse: AxiosResponse = await axios.post(
-                    "http://localhost:8019/api/create_family",
-                    familyForm
-                );
+            if (createFamily)
+            {
+                const familyResponse: AxiosResponse = await axios.post("http://localhost:8019/api/create_family", familyForm);
                 familySuccess = familyResponse.status === 200;
             }
-
             if (response.status === 200 && familySuccess) {
                 alert("Création réussie");
                 router.push("/login");
-            } else {
-                alert("Une erreur est survenue lors de la création.");
             }
-
-        } catch (error) {
-            console.error("Erreur lors de la création :", error);
+        }
+        catch (error)
+        {
+            console.error("Erreur lors de la création:", error);
             alert("Échec de la création");
         }
     }
@@ -96,6 +98,7 @@ export default function RegistrationForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
             {step === 1 && (
                 <div className="space-y-4">
+                    {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                     <div className="flex flex-col space-y-1">
                         <label htmlFor="firstName" className="text-sm font-medium text-gray-700">
                             Nom
@@ -173,8 +176,8 @@ export default function RegistrationForm() {
                             Date de naissance
                         </label>
                         <input
-                            id="birthDate"
-                            name="birthDate"
+                            id="dateOfBirth"
+                            name="dateOfBirth"
                             type="date"
                             value={formData.dateOfBirth}
                             onChange={handleChange}
