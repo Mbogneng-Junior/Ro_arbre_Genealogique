@@ -8,7 +8,7 @@ export default function LoginPage(): JSX.Element {
             <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-8">
                     <div className="text-center mb-8">
-                        <Image src="/placeholder.svg?height=80&width=80" alt="Logo" width={80} height={80} className="mx-auto" />
+                        <Image src="/logo.jpg" alt="Logo" width={100} height={100} className="mx-auto" />
                         <h1 className="text-2xl font-bold mt-4 text-gray-800">Connexion</h1>
                     </div>
 

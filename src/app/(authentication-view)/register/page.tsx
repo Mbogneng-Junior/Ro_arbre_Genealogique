@@ -10,11 +10,11 @@ export default function RegisterPage(): JSX.Element {
                 <div className="w-full md:w-1/2 bg-primary p-8 flex flex-col justify-center items-center text-white">
                     <div className="mb-8">
                         <Image
-                            src="/placeholder.svg?height=120&width=120"
+                            src="/logo.jpg"
                             alt="Logo"
-                            width={120}
-                            height={120}
-                            className="mx-auto"
+                            width={200}
+                            height={200}
+                            className="mx-auto rounded-full"
                         />
                     </div>
                     <h1 className="text-3xl font-bold mb-4 text-center">Votre Histoire Familiale</h1>
