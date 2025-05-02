@@ -134,7 +134,7 @@ public class AuthenticationService {
     private ApiResponse generateToken(Users user){
         ApiResponse apiError = new ApiResponse();
         Map<String, Object> map = new HashMap<>();
-        map.put("Bearer Infos", jwtService.generateJWT(user));
+        map.put("BearerInfos", jwtService.generateJWT(user));
 
         apiError.setData(map);
         apiError.setText("User Login successfully.");
