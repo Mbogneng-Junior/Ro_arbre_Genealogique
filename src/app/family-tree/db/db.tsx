@@ -147,33 +147,33 @@ export const exportData = async (): Promise<FamilyTreeData> => {
 export const sampleFamilyData: FamilyTreeData = {
   persons: [
     // Génération ancienne (années 1920-1940)
-    { id: "p1", name: "Ngoa Ekobo", birthYear: 1925, deathYear: 2005, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p2", name: "Manga Mado", birthYear: 1930, deathYear: 2010, gender: "female", imageUrl: "/api/placeholder/60/60" },
-    { id: "p3", name: "Tchatchouang Ndedi", birthYear: 1935, deathYear: 2015, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p4", name: "Ngo Bikok", birthYear: 1938, gender: "female", imageUrl: "/api/placeholder/60/60" },
+    { id: "p1", name: "Ngoa Ekobo", birthYear: 1925, deathYear: 2005, gender: "male", imageUrl: "/images/avatar-1.png" },
+    { id: "p2", name: "Manga Mado", birthYear: 1930, deathYear: 2010, gender: "female", imageUrl: "/images/avatar.png" },
+    { id: "p3", name: "Tchatchouang Ndedi", birthYear: 1935, deathYear: 2015, gender: "male", imageUrl: "/images/avatar-2.png" },
+    { id: "p4", name: "Ngo Bikok", birthYear: 1938, gender: "female", imageUrl: "/images/avatar-4.png" },
 
     // Génération intermédiaire (années 1950-1970)
-    { id: "p5", name: "Atangana Mballa", birthYear: 1952, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p6", name: "Ngo Bikok Manga", birthYear: 1955, gender: "female", imageUrl: "/api/placeholder/60/60" },
-    { id: "p7", name: "Tchakounté Ngoa", birthYear: 1960, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p8", name: "Ndjock Ekobo", birthYear: 1963, gender: "female", imageUrl: "/api/placeholder/60/60" },
-    { id: "p9", name: "Mbarga Atangana", birthYear: 1968, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p10", name: "Mefire Tchatchouang", birthYear: 1972, gender: "female", imageUrl: "/api/placeholder/60/60" },
+    { id: "p5", name: "Atangana Mballa", birthYear: 1952, gender: "male", imageUrl: "/images/avatar-3.png" },
+    { id: "p6", name: "Ngo Bikok Manga", birthYear: 1955, gender: "female", imageUrl: "/images/avatar-7.png" },
+    { id: "p7", name: "Tchakounté Ngoa", birthYear: 1960, gender: "male", imageUrl: "/images/avatar-9.png" },
+    { id: "p8", name: "Ndjock Ekobo", birthYear: 1963, gender: "female", imageUrl: "/images/avatar-5.png" },
+    { id: "p9", name: "Mbarga Atangana", birthYear: 1968, gender: "male", imageUrl: "/images/avatar-10.png" },
+    { id: "p10", name: "Mefire Tchatchouang", birthYear: 1972, gender: "female", imageUrl: "/images/avatar.png" },
 
     // Génération jeune adulte (années 1980-2000)
-    { id: "p11", name: "Ngoa Mballa", birthYear: 1980, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p12", name: "Mado Atangana", birthYear: 1983, gender: "female", imageUrl: "/api/placeholder/60/60" },
-    { id: "p13", name: "Ndedi Mbarga", birthYear: 1985, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p14", name: "Bikok Tchakounté", birthYear: 1988, gender: "female", imageUrl: "/api/placeholder/60/60" },
-    { id: "p15", name: "Ekobo Ndjock", birthYear: 1992, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p16", name: "Manga Mefire", birthYear: 1995, gender: "female", imageUrl: "/api/placeholder/60/60" },
+    { id: "p11", name: "Ngoa Mballa", birthYear: 1980, gender: "male", imageUrl: "/images/avatar-11.png" },
+    { id: "p12", name: "Mado Atangana", birthYear: 1983, gender: "female", imageUrl: "/images/avatar-8.png" },
+    { id: "p13", name: "Ndedi Mbarga", birthYear: 1985, gender: "male", imageUrl: "/images/avatarr.png" },
+    { id: "p14", name: "Bikok Tchakounté", birthYear: 1988, gender: "female", imageUrl: "/images/avatarr.png" },
+    { id: "p15", name: "Ekobo Ndjock", birthYear: 1992, gender: "male", imageUrl: "/images/avatarr.png" },
+    { id: "p16", name: "Manga Mefire", birthYear: 1995, gender: "female", imageUrl: "/images/avatarr.png" },
 
     // Enfants (années 2010-2020)
-    { id: "p17", name: "Mballa Ngoa", birthYear: 2010, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p18", name: "Atangana Mado", birthYear: 2012, gender: "female", imageUrl: "/api/placeholder/60/60" },
-    { id: "p19", name: "Tchatchouang Ndedi", birthYear: 2015, gender: "male", imageUrl: "/api/placeholder/60/60" },
-    { id: "p20", name: "Ngo Bikok", birthYear: 2018, gender: "female", imageUrl: "/api/placeholder/60/60" },
-    { id: "p21", name: "Mbarga Ekobo", birthYear: 2020, gender: "male", imageUrl: "/api/placeholder/60/60" }
+    { id: "p17", name: "Mballa Ngoa", birthYear: 2010, gender: "male", imageUrl: "/images/avatarr.png" },
+    { id: "p18", name: "Atangana Mado", birthYear: 2012, gender: "female", imageUrl: "/images/avatarr.png" },
+    { id: "p19", name: "Tchatchouang Ndedi", birthYear: 2015, gender: "male", imageUrl: "/images/avatarr.png" },
+    { id: "p20", name: "Ngo Bikok", birthYear: 2018, gender: "female", imageUrl: "/images/avatarr.png" },
+    { id: "p21", name: "Mbarga Ekobo", birthYear: 2020, gender: "male", imageUrl: "/images/avatarr.png" }
   ],
   relationships: [
     // Relations pour la génération ancienne

@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { User, UserPlus, GitMerge, Database, ChevronRight, Search, Users, TreePalm} from 'lucide-react';
+import { User, Users, TreePalm, Search, Settings, UserPlus, GitMerge, Database } from 'lucide-react';
 import FamilyTree from './components/FamilyTree';
 import AddPersonForm from './components/AddPersonForm';
 import PathFinder from './components/PathFinder';
-import { getTabIcon } from './lib/utils';
 import SubfamilyAnalysis from './components/SubfamilyAnalysis';
 import { FamilyTreeData, Person, Relationship } from './lib/types';
 import { 
@@ -20,7 +19,7 @@ import { LoadingScreen } from './loader';
 
 export default function FamTree() {
   const [familyData, setFamilyData] = useState<FamilyTreeData>({ persons: [], relationships: [] });
-  const [activeTab, setActiveTab] = useState<'tree' | 'add' | 'path' | 'subfamily'>('tree');
+  const [activeSection, setActiveSection] = useState('visualiser');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -76,61 +75,107 @@ export default function FamTree() {
     }
   };
 
+  const getSectionIcon = (section) => {
+    switch(section) {
+      case 'gerer': return <User size={20} />;
+      case 'visualiser': return <TreePalm size={20} />;
+      case 'rechercher': return <Search size={20} />;
+      case 'analyser': return <Users size={20} />;
+      case 'parametres': return <Settings size={20} />;
+      default: return <TreePalm size={20} />;
+    }
+  };
+
+  const getSectionTitle = (section) => {
+    switch(section) {
+      case 'gerer': return 'Gérer les membres';
+      case 'visualiser': return 'Visualiser l\'arbre généalogique';
+      case 'rechercher': return 'Rechercher une relation';
+      case 'analyser': return 'Analyser la structure familiale';
+      case 'parametres': return 'Paramètres';
+      default: return 'Arbre généalogique';
+    }
+  };
+
   if (isLoading) {
     return <LoadingScreen />
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-blue-800 mb-2">Arbre Généalogique Familial</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Explorez, construisez et analysez votre histoire familiale avec notre application intuitive
-          </p>
-        </header>
-        
-        <div className="flex justify-center mb-8">
-          <nav className="flex bg-white rounded-xl shadow-lg overflow-hidden">
-            {(['tree', 'add', 'path', 'subfamily'] as const).map((tab) => (
-              <button 
-                key={tab}
-                className={`
-                  px-6 py-3 flex items-center space-x-2 transition-all duration-200
-                  ${activeTab === tab 
-                    ? 'bg-blue-600 text-white font-medium' 
-                    : 'text-gray-700 hover:bg-blue-50'}
-                `}
-                onClick={() => setActiveTab(tab)}
-              >
-                {getTabIcon(tab)}
-                <span className="ml-2 capitalize">
-                  {tab === 'tree' && 'Visualiser'}
-                  {tab === 'add' && 'Ajouter'}
-                  {tab === 'path' && 'Liens'}
-                  {tab === 'subfamily' && 'Analyses'}
-                </span>
-              </button>
-            ))}
-          </nav>
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex">
+      {/* Menu latéral (à gauche) */}
+      <aside className="w-64 bg-white shadow-lg flex flex-col h-screen sticky top-0">
+        <div className="p-4 border-b border-gray-200">
+          <h1 className="text-xl font-bold text-blue-800">Arbre Familial</h1>
         </div>
         
-        <div className="bg-white rounded-xl shadow-xl p-6 border border-gray-100">
-          <div className="mb-4">
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
-              {activeTab === 'tree' && <><TreePalm size={20} className="mr-2 text-blue-600" /> Visualisation de l'arbre</>}
-              {activeTab === 'add' && <><UserPlus size={20} className="mr-2 text-blue-600" /> Ajouter des données</>}
-              {activeTab === 'path' && <><GitMerge size={20} className="mr-2 text-blue-600" /> Trouver un lien familial</>}
-              {activeTab === 'subfamily' && <><Users size={20} className="mr-2 text-blue-600" /> Analyse de sous-familles</>}
-            </h2>
-            <div className="h-1 w-20 bg-blue-600 mt-2 mb-6 rounded-full"></div>
-          </div>
-          
-          {activeTab === 'tree' && (
-            <FamilyTree familyData={familyData} />
-          )}
-          
-          {activeTab === 'add' && (
+        <nav className="flex-1 p-2">
+          <ul className="space-y-1">
+            <li>
+              <button 
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'gerer' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                onClick={() => setActiveSection('gerer')}
+              >
+                <User size={18} className="mr-3" />
+                <span>Gérer les membres</span>
+              </button>
+            </li>
+            <li>
+              <button 
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'visualiser' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                onClick={() => setActiveSection('visualiser')}
+              >
+                <TreePalm size={18} className="mr-3" />
+                <span>Visualiser l'arbre</span>
+              </button>
+            </li>
+            <li>
+              <button 
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'rechercher' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                onClick={() => setActiveSection('rechercher')}
+              >
+                <Search size={18} className="mr-3" />
+                <span>Rechercher une relation</span>
+              </button>
+            </li>
+            <li>
+              <button 
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'analyser' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                onClick={() => setActiveSection('analyser')}
+              >
+                <Users size={18} className="mr-3" />
+                <span>Analyser la structure</span>
+              </button>
+            </li>
+            <li>
+              <button 
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'parametres' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                onClick={() => setActiveSection('parametres')}
+              >
+                <Settings size={18} className="mr-3" />
+                <span>Paramètres</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+        
+        <div className="p-4 border-t border-gray-200 text-center">
+          <p className="text-xs text-gray-500">© {new Date().getFullYear()} Arbre Familial</p>
+        </div>
+      </aside>
+      
+      {/* Zone centrale (à droite) */}
+      <div className="flex-1 p-8">
+        <header className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+            {getSectionIcon(activeSection)}
+            <span className="ml-3">{getSectionTitle(activeSection)}</span>
+          </h2>
+          <div className="h-1 w-24 bg-blue-600 mt-2 rounded-full"></div>
+        </header>
+        
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          {activeSection === 'gerer' && (
             <AddPersonForm 
               persons={familyData.persons}
               onAddPerson={handleAddPerson}
@@ -138,18 +183,57 @@ export default function FamTree() {
             />
           )}
           
-          {activeTab === 'path' && (
+          {activeSection === 'visualiser' && (
+            <FamilyTree familyData={familyData} />
+          )}
+          
+          {activeSection === 'rechercher' && (
             <PathFinder familyData={familyData} />
           )}
           
-          {activeTab === 'subfamily' && (
+          {activeSection === 'analyser' && (
             <SubfamilyAnalysis familyData={familyData} />
           )}
+          
+          {activeSection === 'parametres' && (
+            <div className="p-4">
+              <h3 className="text-xl font-medium mb-4">Paramètres de l'application</h3>
+              <div className="space-y-4">
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <h4 className="font-medium mb-2">Apparence</h4>
+                  <div className="flex items-center">
+                    <span className="mr-4">Thème:</span>
+                    <select className="border rounded-md px-3 py-2">
+                      <option>Clair</option>
+                      <option>Sombre</option>
+                      <option>Système</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <h4 className="font-medium mb-2">Langue</h4>
+                  <div className="flex items-center">
+                    <span className="mr-4">Langue:</span>
+                    <select className="border rounded-md px-3 py-2">
+                      <option>Français</option>
+                      <option>English</option>
+                      <option>Español</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <h4 className="font-medium mb-2">Base de données</h4>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center">
+                    <Database size={16} className="mr-2" />
+                    Exporter les données
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        
-        <footer className="mt-12 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} Arbre Généalogique Familial. Tous droits réservés.</p>
-        </footer>
       </div>
     </main>
   );
