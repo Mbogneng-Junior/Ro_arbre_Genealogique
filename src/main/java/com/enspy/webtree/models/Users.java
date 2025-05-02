@@ -23,22 +23,48 @@ public class Users implements UserDetails {
     private String FirstName;
     private String LastName;
     private String username;
+    
+    private String password;
 
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collection.emptyList();
     }
 
-    @Override
+    
     public String getPassword() {
-        return null;
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    @Override
+    
     public String getUsername() {
-        return null;
+        return username;
+    }
+    
+    public void setFirstName(String firstname) {
+        this.FirstName = firstname;
+    }
+    
+    public String getFirstName() {
+        return FirstName;
+    }
+    
+    public void setLastName(String lastname) {
+        this.LastName = lastname;
+    }
+    
+    public String getLastName() {
+        return LastName;
+    }
+    
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
@@ -60,6 +86,4 @@ public class Users implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
-
-
 }
