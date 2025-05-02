@@ -115,9 +115,8 @@ public class StorageService {
         ApiResponse apiError = new ApiResponse();
         if (files.length > 0) {
             Arrays.stream(files).forEach((file) -> {
-                String type = getFileType(file.getOriginalFilename());
-                this.deleteSingleFile(username, null, file.getOriginalFilename());
-                this.save(file, username, type, null);
+                this.deleteSingleFile(username);
+                this.save(file, username);
                 com.gloswitch.user_service.dto.File uploaded = new com.gloswitch.user_service.dto.File();
                 uploaded.setFilename(file.getOriginalFilename());
                 uploaded.setContent(file.getContentType());
@@ -138,8 +137,8 @@ public class StorageService {
 
         ApiError updateKycStatus  = verifyAllFileKYCIsPresent(username);
         return apiError;
-    }*/
-
+    }
+*/
 
 
 }
