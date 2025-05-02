@@ -30,6 +30,7 @@ public class Users implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
     private String email;
+    private String folder;
 
 
     @JsonBackReference("members")
