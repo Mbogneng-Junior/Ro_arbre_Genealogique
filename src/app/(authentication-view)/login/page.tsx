@@ -46,7 +46,7 @@ export default function LoginPage(): JSX.Element {
 
     return (
         <>
-            <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
+            <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-primary/30">
                 <div className="w-full max-w-md bg-base-color rounded-xl shadow-lg overflow-hidden">
                     <div className="p-8">
                         <div className="text-center mb-8">
@@ -55,7 +55,7 @@ export default function LoginPage(): JSX.Element {
                         </div>
 
                         <form className="space-y-4" onSubmit={handleSubmit}>
-                            {errorMessage && <p className="text-red-500 font-semibold m-2">{errorMessage}</p>}
+                            {errorMessage && <p className="text-red-500 font-semibold m-2 text-sm">{errorMessage}</p>}
                             <div className="flex flex-col space-y-1">
                                 <label htmlFor="email" className="text-sm font-medium text-gray-700">
                                     Email

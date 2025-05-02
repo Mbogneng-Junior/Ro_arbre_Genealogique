@@ -5,7 +5,7 @@ import RegistrationForm from "@/components/RegistrationForm";
 
 export default function RegisterPage(): JSX.Element {
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
+        <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-primary/30">
             <div className="w-full max-w-4xl flex flex-col md:flex-row bg-base-color rounded-xl shadow-lg overflow-hidden">
                 <div className="w-full md:w-1/2 bg-primary p-8 flex flex-col justify-center items-center text-white">
                     <div className="mb-8">
