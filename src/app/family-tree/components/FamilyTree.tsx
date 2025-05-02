@@ -685,7 +685,7 @@ const highlightPath = (path: Relationship[]) => {
                       <ChevronsRight size={16} className="flex-shrink-0 text-amber-600 mr-1" />
                       <span className="font-medium text-amber-800">Type de relation:</span>
                     </div>
-                    <p className="ml-6 text-amber-800">{pathDescription}</p>
+                    <p className="ml-6 text-amber-800">{selectedPerson.name} est le {pathDescription} de {rootPerson.name}</p>
                   </div>
                 </div>
               )}
