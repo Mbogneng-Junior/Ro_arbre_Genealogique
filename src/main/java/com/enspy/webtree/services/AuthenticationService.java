@@ -1,7 +1,6 @@
 package com.enspy.webtree.services;
 
 
-import com.enspy.webtree.config.PasswordEncoderConfig;
 import com.enspy.webtree.dto.requests.ConnectToFamilyDTO;
 import com.enspy.webtree.dto.requests.CreateUserDto;
 import com.enspy.webtree.dto.requests.LoginDTO;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AuthenticationService {
@@ -40,60 +38,77 @@ public class AuthenticationService {
     private JWTService jwtService;
 
 
-    public String generateUsername(Users user){
+    public String generateUsername(){
         boolean exist = true;
         String username = null;
         while (exist) {
             try {
                 username = RandomStringGenerator.generateRandomString(10);
-                user.setUsername(username);
-                userRepository.save(user);
-                exist = false;
-            } catch (DataIntegrityViolationException | ConstraintViolationException e) {
+
+                if (userRepository.findByUsername(username).isEmpty()) {
+                    exist = false;
+
+                    if (username == null) {
+                        throw new RuntimeException("Generated username is null");
+                    }
+                }
+            } catch (Exception e) {
                 exist = true;
             }
         }
         return username;
-
     }
 
-    public ApiResponse createUser(CreateUserDto createUserDto){
+    public ApiResponse createUser(CreateUserDto createUserDto) {
         Users user = new Users();
         ApiResponse response = new ApiResponse();
 
         try {
-            Optional<Users> userOpt  = userRepository.findByEmail(createUserDto.getEmail());
-            if(userOpt.isPresent()){
+
+            Optional<Users> userOpt = userRepository.findByEmail(createUserDto.getEmail());
+            if (userOpt.isPresent()) {
                 response.setText("email already used");
                 response.setValue("409");
                 return response;
             }
+
+            String username = generateUsername();
+
             user.setEmail(createUserDto.getEmail());
             user.setFirstName(createUserDto.getFirstName());
             user.setLastName(createUserDto.getLastName());
+            user.setUsername(username);
             user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
             user.setDateOfBirth(createUserDto.getDateOfBirth());
-            if(createUserDto.getFamilyId() != null){
-                Optional<Family> familyOtp = familyRepository.findById(createUserDto.getFamilyId());
-                if(familyOtp.isEmpty()){
-                    response.setText("La famille n'existe pas");
-                    response.setValue("404");
-                    return response;
-                }
-                user.addFamily(familyOtp.get());
-            }
-            String username = generateUsername(user);
-            response.setText("User creates Sucessfully");
-            response.setValue("200");
-            response.setData(username);
-            return response;
 
+
+            Users savedUser = userRepository.save(user);
+
+
+            Optional<Users> freshUserOpt = userRepository.findById(savedUser.getId());
+            if (freshUserOpt.isPresent()) {
+                Users freshUser = freshUserOpt.get();
+
+                response.setText("User created Successfully");
+                response.setValue("200");
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("username", freshUser.getUsername());
+                userInfo.put("name1", freshUser.getFirstName());
+                userInfo.put("name2", freshUser.getLastName());
+                userInfo.put("id", freshUser.getId());
+                userInfo.put("password", createUserDto.getPassword()); // Mot de passe non encodé
+
+                response.setData(userInfo);
+                return response;
+            } else {
+                throw new RuntimeException("Could not retrieve saved user");
+            }
         } catch (Exception e) {
-            response.setText("Error creating user" + e.getMessage());
+            e.printStackTrace(); // Log complet de l'erreur
+            response.setText("Error creating user: " + e.getMessage());
             response.setValue("500");
             return response;
         }
-
     }
 
 
@@ -107,6 +122,11 @@ public class AuthenticationService {
             return response;
         }
         Users user = userOpt.get();
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword()) ) {
+            response.setValue("401");
+            response.setText("invalid password");
+            return response;
+        }
 
         return generateToken(user);
     }
@@ -114,7 +134,7 @@ public class AuthenticationService {
     private ApiResponse generateToken(Users user){
         ApiResponse apiError = new ApiResponse();
         Map<String, Object> map = new HashMap<>();
-        map.put("Bearer Infos", jwtService.generate(user.getUsername()));
+        map.put("Bearer Infos", jwtService.generateJWT(user));
 
         apiError.setData(map);
         apiError.setText("User Login successfully.");

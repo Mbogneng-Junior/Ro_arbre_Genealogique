@@ -12,17 +12,17 @@ import java.util.UUID;
 @Service
 public class UserService implements UserDetailsService {
 
-
+    private UserRepository userRepository;
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+        return userRepository.findByUsername(username).get();
     }
 
-    private UserRepository userRepository;
+
 
 
 }

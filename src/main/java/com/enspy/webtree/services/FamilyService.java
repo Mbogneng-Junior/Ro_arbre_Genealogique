@@ -46,9 +46,10 @@ public class FamilyService {
             Family family = new Family();
             family.setFamilyName(createFamilyDTO.getFamilyName());
             family.addMember(user);
-            familyRepository.save(family);
+            Family saved  = familyRepository.save(family);
             response.setText("Family created successfully");
             response.setValue("200");
+            response.setData(saved.getId());
 
             if(createFamilyDTO.getFamilyMembers() != null){
                 for (CreateRelationDTO relationDTO : createFamilyDTO.getFamilyMembers()){
@@ -64,6 +65,25 @@ public class FamilyService {
             return response;
         }
 
+    }
+
+    public ApiResponse addMember(CreateRelationDTO createRelationDTO){
+        Family family = familyRepository.findById(createRelationDTO.getFamilyId()).orElse(null);
+        if(family == null){
+            ApiResponse response = new ApiResponse();
+            response.setText("Invalid family id");
+            response.setValue("404");
+            return response;
+        }
+        try {
+            Relations relations = createRelation(createRelationDTO);
+            return addMemberToFamily(relations, family);
+        } catch (Exception e){
+            ApiResponse response = new ApiResponse();
+            response.setText("an error occured :" + e.getMessage());
+            response.setValue("500");
+            return response;
+        }
     }
 
     public ApiResponse addMemberToFamily(Relations relations, Family family){
