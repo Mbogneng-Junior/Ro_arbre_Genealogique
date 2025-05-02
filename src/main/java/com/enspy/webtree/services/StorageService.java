@@ -1,6 +1,7 @@
 package com.enspy.webtree.services;
 
 
+import com.enspy.webtree.dto.responses.ApiResponse;
 import com.enspy.webtree.models.Users;
 import com.enspy.webtree.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -86,6 +87,58 @@ public class StorageService {
             throw new RuntimeException(e);
         }
     }
+
+
+    public void deleteSingleFile(String username) {
+        String userPath = this.getUserPath(username);
+
+        if (userPath == null || userPath.isEmpty()) {
+            throw new IllegalArgumentException("User path is invalid or empty");
+        }
+
+        File targetFile = new File(userPath);
+
+
+        if (targetFile.exists() && !targetFile.isDirectory()) {
+            if (targetFile.delete()) {
+                System.out.println("File deleted successfully: " + targetFile.getAbsolutePath());
+            } else {
+                throw new RuntimeException("Failed to delete file: " + targetFile.getAbsolutePath());
+            }
+        }
+    }
+
+
+    /*public ApiResponse UploadMultipleFile(String username, MultipartFile[] files) {
+
+        Map<String, Object> map = new HashMap<>();
+        ApiResponse apiError = new ApiResponse();
+        if (files.length > 0) {
+            Arrays.stream(files).forEach((file) -> {
+                String type = getFileType(file.getOriginalFilename());
+                this.deleteSingleFile(username, null, file.getOriginalFilename());
+                this.save(file, username, type, null);
+                com.gloswitch.user_service.dto.File uploaded = new com.gloswitch.user_service.dto.File();
+                uploaded.setFilename(file.getOriginalFilename());
+                uploaded.setContent(file.getContentType());
+                uploaded.setSize(file.getSize());
+                map.put(file.getOriginalFilename(), uploaded);
+            });
+        }
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            apiError.setText("Account not found");
+            apiError.setValue("404");
+            apiError.setData(null);
+        } else {
+            apiError.setText("Files Uploaded Successfully");
+            apiError.setValue("200");
+            apiError.setData(map);
+        }
+
+        ApiError updateKycStatus  = verifyAllFileKYCIsPresent(username);
+        return apiError;
+    }*/
 
 
 
