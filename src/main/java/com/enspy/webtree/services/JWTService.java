@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -14,6 +15,7 @@ import java.util.*;
 import java.util.function.Function;
 
 @Service
+@AllArgsConstructor
 public class JWTService {
 
     private UserRepository userRepository;
@@ -68,7 +70,7 @@ public class JWTService {
                 "familyName", family.getFamilyName(),
                 "userId", family.getId() + "",
                 Claims.EXPIRATION, new Date(expiration),
-                Claims.SUBJECT, family.getId());
+                Claims.SUBJECT, family.getFamilyName());
 
         String bearer = Jwts.builder()
                 .claims(claims)
