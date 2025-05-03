@@ -35,12 +35,12 @@ function useLogin() {
         setIsLoading(true);
         try
         {
-            const response: AxiosResponse = await axios.post("http://localhost:8019/api/login/", data);
+            const response: AxiosResponse = await axios.post("http://localhost:8019/api/login", data);
             if (response.status === 200)
             {
                 setIsLoading(false);
                 console.log("logged user data: ",response);
-                saveAuthParameters(response.data.data.bearerInfos.Bearer);
+                saveAuthParameters(response.data.data.BearerInfos.Bearer);
                // setUserData(response.data.user);
                 await getCurrentUserInfos();
                 setIsLogged(true);
@@ -63,7 +63,7 @@ function useLogin() {
 
     async function getCurrentUserInfos  ()
     {
-        const token = localStorage.getItem("token_key_fultang");
+        const token = localStorage.getItem("family_tree_token");
         if (token)
         {
             try
@@ -88,7 +88,7 @@ function useLogin() {
 
 
     useEffect(() => {
-        const token = localStorage.getItem("token_key_fultang");
+        const token = localStorage.getItem("family_tree_token");
         if (token)
         {
             setIsLogged(true);
@@ -108,10 +108,6 @@ function useLogin() {
     {
         return isLogged;
     }
-
-
-
-
 
 
 

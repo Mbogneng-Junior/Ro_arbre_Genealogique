@@ -221,8 +221,8 @@ export default function RegistrationForm() {
                                     Identifiant unique (nom d'utilisateur)
                                 </label>
                                 <input
-                                    id="familyName"
-                                    name="familyName"
+                                    id="username"
+                                    name="username"
                                     type="text"
                                     value={familyForm.username}
                                     onChange={handleFamilyFormChange}
