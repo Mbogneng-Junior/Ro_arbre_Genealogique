@@ -22,3 +22,12 @@ export type AxiosResponse<T>={
 export type AxiosRegistrationResponse={
     data:AxiosResponse<string>,
 }
+
+export type LoginFormType = {
+    email:"",
+    password:""
+}
+
+export type AxiosLoginResponse={
+    data:AxiosResponse<object>,
+}

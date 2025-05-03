@@ -1,7 +1,8 @@
 "use client";
 import constate from "constate";
 import {useEffect, useMemo, useState} from "react";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
+import {LoginFormType} from "@/lib/type";
 
 
 
@@ -29,6 +30,34 @@ function useLogin() {
     }
 
 
+    async function login (data: LoginFormType): Promise<number|undefined>
+    {
+        setIsLoading(true);
+        try
+        {
+            const response: AxiosResponse = await axios.post("http://localhost:8019/api/login/", data);
+            if (response.status === 200)
+            {
+                setIsLoading(false);
+                console.log("logged user data: ",response);
+                saveAuthParameters(response.data.data.bearerInfos.Bearer);
+               // setUserData(response.data.user);
+                await getCurrentUserInfos();
+                setIsLogged(true);
+                return response.status;
+            }
+        }
+        catch (error)
+        {
+            setIsLoading(false);
+            console.error("Authentication error:", error);
+            const axiosError = error as AxiosResponse;
+            return axiosError.status;
+        }
+    }
+
+
+
 
 
 
@@ -39,7 +68,7 @@ function useLogin() {
         {
             try
             {
-                const response = await axios.get("http://localhost:8080/api/user", {headers: {"Authorization": `Bearer ${token}`}});
+                const response = await axios.get("http://localhost:8019/api/user", {headers: {"Authorization": `Bearer ${token}`}});
                 if (response.status === 200)
                 {
                     console.log(response.data);
@@ -101,8 +130,9 @@ function useLogin() {
         isLoading,
         userData,
         isLogged,
+        login,
         isAuthenticated,
         logout,
-    }), [isLoading, userData, isLogged, logout]);
+    }), [isLoading, userData, isLogged, logout, login]);
     return {authMethods}
 }
