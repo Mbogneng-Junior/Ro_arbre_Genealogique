@@ -49,7 +49,7 @@ export default function LoginPage(): JSX.Element {
             <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-primary/30">
                 <div className="w-full max-w-md bg-base-color rounded-xl shadow-lg overflow-hidden">
                     <div className="p-8">
-                        <div className="text-center mb-8">
+                        <div onClick={()=> router.push("/")} className="cursor-pointer text-center mb-8">
                             <Image src="/logo.jpg" alt="Logo" width={120} height={120} className="mx-auto" />
                             <h1 className="text-2xl font-bold mt-4 text-gray-800">Connexion</h1>
                         </div>

@@ -9,7 +9,7 @@ import {
     FamilyFormType,
     RegistrationFormType
 } from "@/lib/type";
-import axios, {AxiosResponse} from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 
 
 export default function RegistrationForm() {
@@ -48,6 +48,8 @@ export default function RegistrationForm() {
     }
 
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [familyErrorMessage, setFamilyErrorMessage] = useState<string>("");
+    const [userErrorMessage, setUserErrorMessage] = useState<string>("");
 
     function nextStep ():void
         {
@@ -58,7 +60,6 @@ export default function RegistrationForm() {
             }
             else {
                 setErrorMessage("veuillez remplir tous les champs");
-             //   alert("veuillez remplir tous les champs");
             }
 
 
@@ -75,13 +76,24 @@ export default function RegistrationForm() {
         console.log("Family form submitted:", familyForm);
         try {
             const response: AxiosResponse<AxiosRegistrationResponse> = await axios.post("http://localhost:8019/api/register", formData);
+            setErrorMessage("");
             let familySuccess = true;
             if (createFamily)
             {
-                const familyResponse: AxiosResponse = await axios.post("http://localhost:8019/api/create_family", familyForm);
-                familySuccess = familyResponse.status === 200;
+                try 
+                {
+                    const familyResponse: AxiosResponse = await axios.post("http://localhost:8019/api/create_family", familyForm);
+                    familySuccess = familyResponse.status === 200;
+                }
+                catch (error)
+                {
+                    console.log(error)
+                    setFamilyErrorMessage("Une erreur est survenue lors de la création de votre famille, veuillez réessayer plutard!!")
+                }
+              
             }
             if (response.status === 200 && familySuccess) {
+                setErrorMessage("");
                 alert("Création réussie");
                 router.push("/login");
             }
@@ -89,7 +101,7 @@ export default function RegistrationForm() {
         catch (error)
         {
             console.error("Erreur lors de la création:", error);
-            alert("Échec de la création");
+            setErrorMessage("Une erreur est survenue dans le processus de votre enregistrement veuillez réessayer !");
         }
     }
 

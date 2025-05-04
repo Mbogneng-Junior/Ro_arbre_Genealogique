@@ -1,61 +1,25 @@
+"use client";
 import Link from "next/link"
-import { PlusCircle, Search, Users, Home, Settings, LogOut, ChevronRight, Clock } from "lucide-react"
+import { PlusCircle, Search, Users, Home, Settings, LogOut, ChevronRight } from "lucide-react"
+import {useAuthentication} from "@/utils/Provider";
+import Sidebar from "@/components/Sidebar";
 
 export default function Dashboard() {
     // Données simulées pour les familles
     const families = [
-        { id: 1, name: "Famille Dupont", members: 12, lastUpdated: "Il y a 2 jours" },
-        { id: 2, name: "Famille Martin", members: 8, lastUpdated: "Il y a 1 semaine" },
-        { id: 3, name: "Famille Dubois", members: 15, lastUpdated: "Aujourd'hui" },
-        { id: 4, name: "Famille Lefèvre", members: 6, lastUpdated: "Il y a 3 jours" },
-    ]
+        { id: 1, name: "Famille Dupont", members: 12 },
+        { id: 2, name: "Famille Martin", members: 8 },
+        { id: 3, name: "Famille Dubois", members: 15},
+        { id: 4, name: "Famille Lefèvre", members: 6 },
+    ];
 
-    // Données simulées pour l'activité récente
-    const recentActivity = [
-        { id: 1, action: "Ajout d'un membre", family: "Famille Dupont", time: "Il y a 2 heures" },
-        { id: 2, action: "Modification de relation", family: "Famille Martin", time: "Il y a 1 jour" },
-        { id: 3, action: "Recherche de relation", family: "Famille Dubois", time: "Aujourd'hui" },
-    ]
+
+
 
     return (
         <div className="flex h-screen bg-gray-50">
             {/* Sidebar */}
-            <div className="hidden w-64 flex-shrink-0 border-r border-gray-200 bg-white md:flex md:flex-col">
-                <div className="flex h-16 items-center justify-center border-b border-gray-200">
-                    <h1 className="text-xl font-semibold text-teal-600">ArbreGénéalogique</h1>
-                </div>
-                <div className="flex flex-1 flex-col overflow-y-auto">
-                    <nav className="flex-1 space-y-1 px-2 py-4">
-                        <Link
-                            href="/dashboard"
-                            className="flex items-center rounded-md bg-teal-50 px-3 py-2 text-sm font-medium text-teal-700"
-                        >
-                            <Home className="mr-3 h-5 w-5 text-teal-500" />
-                            Tableau de bord
-                        </Link>
-                        <Link
-                            href="/dashboard/families"
-                            className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                            <Users className="mr-3 h-5 w-5 text-gray-400" />
-                            Mes familles
-                        </Link>
-                        <Link
-                            href="/dashboard/settings"
-                            className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                            <Settings className="mr-3 h-5 w-5 text-gray-400" />
-                            Paramètres
-                        </Link>
-                    </nav>
-                    <div className="border-t border-gray-200 p-4">
-                        <button className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                            <LogOut className="mr-3 h-5 w-5 text-gray-400" />
-                            Déconnexion
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <Sidebar/>
 
             {/* Main content */}
             <div className="flex flex-1 flex-col overflow-hidden">

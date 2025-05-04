@@ -1,14 +1,18 @@
+"use client";
 import Image from "next/image"
 import Link from "next/link"
 import {JSX} from "react";
 import RegistrationForm from "@/components/RegistrationForm";
+import {useRouter} from "next/navigation";
+
 
 export default function RegisterPage(): JSX.Element {
+    const router = useRouter();
     return (
         <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-primary/30">
             <div className="w-full max-w-4xl flex flex-col md:flex-row bg-base-color rounded-xl shadow-lg overflow-hidden">
                 <div className="w-full md:w-1/2 bg-primary p-8 flex flex-col justify-center items-center text-white">
-                    <div className="mb-8">
+                    <div onClick={()=> router.push("/")} className="cursor-pointer mb-8">
                         <Image
                             src="/logo.jpg"
                             alt="Logo"

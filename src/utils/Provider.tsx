@@ -14,8 +14,8 @@ export const [FamilyTreeProvider, useAuthentication] = constate(useLogin, value 
 
 function useLogin() {
 
-    const [isLogged, setIsLogged] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLogged, setIsLogged] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userData, setUserData] = useState({});
 
 
@@ -43,7 +43,6 @@ function useLogin() {
                 saveAuthParameters(response.data.data.BearerInfos.Bearer);
                // setUserData(response.data.user);
                 await getCurrentUserInfos();
-                setIsLogged(true);
                 return response.status;
             }
         }
@@ -104,12 +103,6 @@ function useLogin() {
 
 
 
-    function isAuthenticated()
-    {
-        return isLogged;
-    }
-
-
 
 
     function logout()
@@ -117,6 +110,7 @@ function useLogin() {
         clearLocalStorage();
         setIsLogged(false);
         setUserData({});
+        window.location.href="/";
     }
 
 
@@ -127,8 +121,7 @@ function useLogin() {
         userData,
         isLogged,
         login,
-        isAuthenticated,
         logout,
-    }), [isLoading, userData, isLogged, logout, login]);
+    }), [isLoading, userData, isLogged, login]);
     return {authMethods}
 }
