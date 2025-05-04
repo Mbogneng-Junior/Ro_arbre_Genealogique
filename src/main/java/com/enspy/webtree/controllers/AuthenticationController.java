@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @AllArgsConstructor
@@ -19,8 +21,8 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody CreateUserDto createUserDto) {
-        ApiResponse response = this.authenticationService.createUser(createUserDto);
+    public ResponseEntity<ApiResponse> register( CreateUserDto createUserDto,  MultipartFile[] profile) {
+        ApiResponse response = this.authenticationService.createUser(createUserDto, profile);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(Integer.parseInt(response.getValue())));
     }
 
@@ -35,4 +37,6 @@ public class AuthenticationController {
         ApiResponse response = this.authenticationService.connectToFamily(connect);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(Integer.parseInt(response.getValue())));
     }
+
+
 }

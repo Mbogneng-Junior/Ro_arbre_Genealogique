@@ -39,6 +39,7 @@ public class Security {
                             .requestMatchers("/register").permitAll()
                             .requestMatchers("/login").permitAll()
                             .requestMatchers("/create_family").permitAll()
+                            .requestMatchers("/profile/**").permitAll()
 
 
                             .anyRequest().authenticated();

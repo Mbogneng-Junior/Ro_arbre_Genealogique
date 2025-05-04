@@ -7,6 +7,11 @@ import com.enspy.webtree.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,9 +80,9 @@ public class StorageService {
             String storedFile = "";
 
                 if (!Files.exists(Path.of(userPath))) {
-                    new File(userPath).mkdir();
+                    new File(userPath + "/" + filename).mkdir();
                 }
-                storedFile = userPath + filename;
+                storedFile = userPath + "/" + filename;
 
             File dest = new File(storedFile);
             file.transferTo(dest);
@@ -89,15 +94,14 @@ public class StorageService {
     }
 
 
-    public void deleteSingleFile(String username) {
+    public void deleteSingleFile(String username, String fileName) {
         String userPath = this.getUserPath(username);
 
         if (userPath == null || userPath.isEmpty()) {
             throw new IllegalArgumentException("User path is invalid or empty");
         }
 
-        File targetFile = new File(userPath);
-
+        File  targetFile = new File(userPath + "/person/" + fileName);
 
         if (targetFile.exists() && !targetFile.isDirectory()) {
             if (targetFile.delete()) {
@@ -115,7 +119,7 @@ public class StorageService {
         ApiResponse apiError = new ApiResponse();
         if (files.length > 0) {
             Arrays.stream(files).forEach((file) -> {
-                this.deleteSingleFile(username);
+                this.deleteSingleFile(username, file.getOriginalFilename());
                 this.save(file, username);
                 com.enspy.webtree.dto.requests.File uploaded = new com.enspy.webtree.dto.requests.File();
                 uploaded.setFilename(file.getOriginalFilename());
@@ -136,6 +140,84 @@ public class StorageService {
         }
         return apiError;
     }
+
+
+
+    public List<File> getAllFilesInDirectory(String directoryName) {
+        if (directoryName == null || directoryName.isEmpty()) {
+            throw new IllegalArgumentException("Le nom du répertoire ne peut pas être null ou vide.");
+        }
+        File directory = new File(directoryName);
+        if (!directory.exists()) {
+            throw new IllegalArgumentException("Le répertoire spécifié n'existe pas : " + directoryName);
+        }
+        if (!directory.isDirectory()) {
+            throw new IllegalArgumentException("Le chemin spécifié n'est pas un répertoire : " + directoryName);
+        }
+        File[] filesArray = directory.listFiles();
+        if (filesArray == null) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(filesArray);
+    }
+
+
+    public String getFileNameWithoutExtension(File file) {
+        String fileName = file.getName();
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
+            return fileName.substring(0, lastDotIndex);
+        }
+        return fileName;
+    }
+
+
+    public ResponseEntity<Resource> getFile(String username, String fileName) {
+        String userPath = this.getUserPath(username);
+
+        if (userPath == null || userPath.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+
+        File targetFile = new File(userPath + "/" + fileName);
+        String[] possibleExtensions = { ".png", ".PNG", ".jpg", ".jpeg" };
+
+        if (!targetFile.exists() || targetFile.isDirectory()) {
+            for (String ext : possibleExtensions) {
+                File possibleFile = new File(userPath + "/" + fileName + ext);
+                if (possibleFile.exists() && !possibleFile.isDirectory()) {
+                    targetFile = possibleFile;
+                    break;
+                }
+            }
+        }
+
+        if (targetFile.exists() && !targetFile.isDirectory()) {
+            try {
+                String mimeType = Files.probeContentType(targetFile.toPath());
+                Resource fileResource = new FileSystemResource(targetFile);
+
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, mimeType)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + targetFile.getName() + "\"")
+                        .body(fileResource);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(null);
+            }
+        } else {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+    }
+
+
+
+
+
 
 
 }

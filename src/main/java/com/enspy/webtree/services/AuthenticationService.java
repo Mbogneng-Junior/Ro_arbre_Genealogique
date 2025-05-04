@@ -14,6 +14,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,9 +25,11 @@ public class AuthenticationService {
 
     public AuthenticationService(UserRepository userRepository,
                                  PasswordEncoder passwordEncoder,
+                                 StorageService storageService,
                                  FamilyRepository familyRepository,
                                  JWTService jwtService) {
         this.userRepository = userRepository;
+        this.storageService = storageService;
         this.passwordEncoder = passwordEncoder;
         this.familyRepository = familyRepository;
         this.jwtService = jwtService;
@@ -36,6 +39,7 @@ public class AuthenticationService {
     PasswordEncoder passwordEncoder;
     private FamilyRepository familyRepository;
     private JWTService jwtService;
+    private StorageService storageService;
 
 
     public String generateUsername(){
@@ -59,7 +63,7 @@ public class AuthenticationService {
         return username;
     }
 
-    public ApiResponse createUser(CreateUserDto createUserDto) {
+    public ApiResponse createUser(CreateUserDto createUserDto, MultipartFile[] profile) {
         Users user = new Users();
         ApiResponse response = new ApiResponse();
 
@@ -81,10 +85,9 @@ public class AuthenticationService {
             user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
             user.setDateOfBirth(createUserDto.getDateOfBirth());
 
-
             Users savedUser = userRepository.save(user);
 
-
+            storageService.UploadMultipleFile(savedUser.getUsername(), profile);
             Optional<Users> freshUserOpt = userRepository.findById(savedUser.getId());
             if (freshUserOpt.isPresent()) {
                 Users freshUser = freshUserOpt.get();
