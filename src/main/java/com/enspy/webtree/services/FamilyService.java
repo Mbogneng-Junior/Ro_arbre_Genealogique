@@ -1,67 +1,133 @@
 package com.enspy.webtree.services;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-import org.springframework.web.filter.OncePerRequestFilter;
-
+import com.enspy.webtree.dto.requests.CreateFamilyDTO;
+import com.enspy.webtree.dto.requests.CreateRelationDTO;
+import com.enspy.webtree.dto.responses.ApiResponse;
+import com.enspy.webtree.models.Family;
+import com.enspy.webtree.models.Relations;
 import com.enspy.webtree.models.Users;
+import com.enspy.webtree.repositories.FamilyRepository;
+import com.enspy.webtree.repositories.RelationRepository;
+import com.enspy.webtree.repositories.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import javax.management.relation.Relation;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
-@AllArgsConstructor
-public class JWTFilter extends OncePerRequestFilter {
-    private final JWTService jwtService;
-    private final UserService userService;  // doit exposer à la fois loadUserByUsername et findByUsername
+public class FamilyService {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader("Authorization");
-        if (authorization != null && authorization.startsWith("Bearer ")) {
-            String token = authorization.substring(7);
-            try {
-                if (!jwtService.isTokenExpired(token)) {
-                    String username = jwtService.extractUsername(token);
+    public FamilyService(UserRepository userRepository,
+                         FamilyRepository familyRepository,
+                         RelationRepository relationRepository) {
+        this.userRepository = userRepository;
+        this.familyRepository = familyRepository;
+        this.relationRepository = relationRepository;
+    }
 
-                    // Récupérer d'abord le UserDetails pour les rôles
-                    UserDetails userDetails = userService.loadUserByUsername(username);
-                    // Puis récupérer votre entité Users pour l'utiliser comme principal
-                    Users userEntity = userService.findByUsername(username);
+    private UserRepository userRepository;
+    private RelationRepository relationRepository;
+    private FamilyRepository familyRepository;
 
-                    // S'assurer qu'aucune authentification n'est déjà en place
-                    if (username != null &&
-                        SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                        UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                /* principal = */ userEntity,
-                                /* credentials = */ null,
-                                /* authorities = */ userDetails.getAuthorities()
-                            );
+    public ApiResponse createFamily(CreateFamilyDTO createFamilyDTO) {
+        ApiResponse response = new ApiResponse();
+        Optional<Users> userOpt = userRepository.findByUsername(createFamilyDTO.getUsername());
+        if(userOpt.isEmpty()){
+            response.setText("Invalid username");
+            response.setValue("404");
+            return response;
+        }
+        Users user = userOpt.get();
+        try {
+            Family family = new Family();
+            family.setFamilyName(createFamilyDTO.getFamilyName());
+            family.addMember(user);
+            Family saved  = familyRepository.save(family);
+            response.setText("Family created successfully");
+            response.setValue("200");
+            response.setData(saved.getId());
 
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
+            if(createFamilyDTO.getFamilyMembers() != null){
+                for (CreateRelationDTO relationDTO : createFamilyDTO.getFamilyMembers()){
+                    Relations relation = createRelation(relationDTO);
+                    addMemberToFamily(relation, family);
                 }
-            } catch (ExpiredJwtException e) {
-                logger.warn("Le jeton JWT est expiré", e);
-            } catch (SignatureException e) {
-                logger.error("Signature JWT invalide", e);
-            } catch (Exception e) {
-                logger.error("Erreur lors de la validation du JWT", e);
             }
+            return response;
+
+        } catch (Exception e){
+            response.setText("Error creating family"+ e.getMessage());
+            response.setValue("500");
+            return response;
         }
 
-        filterChain.doFilter(request, response);
+    }
+
+    public ApiResponse addMember(CreateRelationDTO createRelationDTO){
+        Family family = familyRepository.findById(createRelationDTO.getFamilyId()).orElse(null);
+        if(family == null){
+            ApiResponse response = new ApiResponse();
+            response.setText("Invalid family id");
+            response.setValue("404");
+            return response;
+        }
+        try {
+            Relations relations = createRelation(createRelationDTO);
+            return addMemberToFamily(relations, family);
+        } catch (Exception e){
+            ApiResponse response = new ApiResponse();
+            response.setText("an error occured :" + e.getMessage());
+            response.setValue("500");
+            return response;
+        }
+    }
+
+    public ApiResponse addMemberToFamily(Relations relations, Family family){
+        ApiResponse response = new ApiResponse();
+        try {
+            Users userSource  = relations.getSources();
+
+            boolean found = false;
+            for(Family familySource : userSource.getFamilies()){
+                if(familySource.getId().equals(family.getId())){
+                    found = true;
+                }
+            }
+            if(!found){
+                response.setValue("401");
+                response.setText("the User is not member of this family");
+                return response;
+            }
+
+
+                relationRepository.save(relations);
+                Users targetUser = relations.getTarget();
+                family.addMember(targetUser);
+                targetUser.addFamily(family);
+                userRepository.save(targetUser);
+
+            familyRepository.save(family);
+
+            response.setText("Members added successfully");
+            response.setValue("200");
+            return response;
+        } catch (Exception e){
+            response.setText("an error occured :" + e.getMessage());
+            response.setValue("500");
+            return response;
+        }
+    }
+
+    public Relations createRelation(CreateRelationDTO createRelation){
+        Relations relations = new Relations();
+        relations.setPoid(createRelation.getPoid());
+        relations.setSources(userRepository.findByUsername(createRelation.getSourceUsername()).orElse(null));
+        relations.setTarget(userRepository.findByUsername(createRelation.getTargetUsername()).orElse(null));
+        relationRepository.save(relations);
+        return relations;
     }
 }

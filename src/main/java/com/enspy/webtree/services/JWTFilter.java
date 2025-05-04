@@ -1,5 +1,6 @@
 package com.enspy.webtree.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,39 +13,55 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.enspy.webtree.models.Users;
+
 import java.io.IOException;
 
 @Service
 @AllArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
     private final JWTService jwtService;
-    private final UserService userService;
+    private final UserService userService;  // doit exposer à la fois loadUserByUsername et findByUsername
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = null;
-        String username = null;
-        boolean isTokenExpired = true;
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            String token = authorization.substring(7);
+            try {
+                if (!jwtService.isTokenExpired(token)) {
+                    String username = jwtService.extractUsername(token);
 
-        final String authorization = request.getHeader("Authorization");
+                    // Récupérer d'abord le UserDetails pour les rôles
+                    UserDetails userDetails = userService.loadUserByUsername(username);
+                    // Puis récupérer votre entité Users pour l'utiliser comme principal
+                    Users userEntity = userService.findByUsername(username);
 
-        try{
-            if (authorization != null && authorization.startsWith("Bearer ")){
-                token = authorization.substring(7);
-                isTokenExpired = jwtService.isTokenExpired(token);
-                username = jwtService.extractUsername(token);
+                    // S'assurer qu'aucune authentification n'est déjà en place
+                    if (username != null &&
+                        SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                        UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                /* principal = */ userEntity,
+                                /* credentials = */ null,
+                                /* authorities = */ userDetails.getAuthorities()
+                            );
+
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                }
+            } catch (ExpiredJwtException e) {
+                logger.warn("Le jeton JWT est expiré", e);
+            } catch (SignatureException e) {
+                logger.error("Signature JWT invalide", e);
+            } catch (Exception e) {
+                logger.error("Erreur lors de la validation du JWT", e);
             }
+        }
 
-            if (!isTokenExpired && username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-                UserDetails userDetails = userService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-
-        }catch(SignatureException e){System.out.println("Error in signature");}
-
-
-
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }
