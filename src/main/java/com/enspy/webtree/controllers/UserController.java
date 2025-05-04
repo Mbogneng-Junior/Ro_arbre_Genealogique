@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class UserController {
     @PostMapping("/user")
-    public ResponseEntity<Users> getUser(Principal user) {
-        return ResponseEntity.ok((Users) user);
+    public ResponseEntity<Users> getUser(Principal principal) {
+        Users user = (Users) principal;  // Casting sans risque
+        return ResponseEntity.ok(user);
     }
+
 }
