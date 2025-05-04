@@ -38,7 +38,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     // Récupérer d'abord le UserDetails pour les rôles
                     UserDetails userDetails = userService.loadUserByUsername(username);
                     // Puis récupérer votre entité Users pour l'utiliser comme principal
-                    Users userEntity = userRepository.findByUsername(username);
+                    Users userEntity = userRepository.findByUsername(username).get();
 
                     // S'assurer qu'aucune authentification n'est déjà en place
                     if (username != null &&
