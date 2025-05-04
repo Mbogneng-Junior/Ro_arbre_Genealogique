@@ -14,14 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.enspy.webtree.models.Users;
-
+import com.enspy.webtree.repositories.*;
 import java.io.IOException;
 
 @Service
 @AllArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
     private final JWTService jwtService;
-    private final UserService userService;  // doit exposer à la fois loadUserByUsername et findByUsername
+    private final UserService userService;
+    private final UserRepository userRepository; // doit exposer à la fois loadUserByUsername et findByUsername
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -37,7 +38,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     // Récupérer d'abord le UserDetails pour les rôles
                     UserDetails userDetails = userService.loadUserByUsername(username);
                     // Puis récupérer votre entité Users pour l'utiliser comme principal
-                    Users userEntity = userService.findByUsername(username);
+                    Users userEntity = userRepository.findByUsername(username);
 
                     // S'assurer qu'aucune authentification n'est déjà en place
                     if (username != null &&
