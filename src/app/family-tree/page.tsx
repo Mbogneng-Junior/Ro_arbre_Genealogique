@@ -16,6 +16,7 @@ import {
 } from './db/db';
 import { initDB } from './db/db';
 import { LoadingScreen } from './loader';
+import Loading from '../loading';
 
 export default function FamTree() {
   const [familyData, setFamilyData] = useState<FamilyTreeData>({ persons: [], relationships: [] });
@@ -97,23 +98,19 @@ export default function FamTree() {
     }
   };
 
-  if (isLoading) {
-    return <LoadingScreen />
-  }
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex">
+    <main className="min-h-screen bg-gradient-to-b from-[#8BBDBD] from-5% to-white flex">
       {/* Menu latéral (à gauche) */}
-      <aside className="w-64 bg-white shadow-lg flex flex-col h-screen sticky top-0">
+      <aside className="w-72 min-w-64 bg-white shadow-lg flex flex-col h-screen sticky top-0">
         <div className="p-4 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-blue-800">Arbre Familial</h1>
+          <h1 className="text-xl font-bold text-[#8BBDBD]">Arbre Familial</h1>
         </div>
         
         <nav className="flex-1 p-2">
           <ul className="space-y-1">
             <li>
               <button 
-                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'gerer' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'gerer' ? 'bg-[#8BBDBD] text-white' : 'text-[#171717] hover:bg-[#8BBDBD] hover:bg-opacity-10'}`}
                 onClick={() => setActiveSection('gerer')}
               >
                 <User size={18} className="mr-3" />
@@ -122,7 +119,7 @@ export default function FamTree() {
             </li>
             <li>
               <button 
-                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'visualiser' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'visualiser' ? 'bg-[#8BBDBD] text-white' : 'text-[#171717] hover:bg-[#8BBDBD] hover:bg-opacity-10'}`}
                 onClick={() => setActiveSection('visualiser')}
               >
                 <TreePalm size={18} className="mr-3" />
@@ -131,7 +128,7 @@ export default function FamTree() {
             </li>
             <li>
               <button 
-                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'rechercher' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'rechercher' ? 'bg-[#8BBDBD] text-white' : 'text-[#171717] hover:bg-[#8BBDBD] hover:bg-opacity-10'}`}
                 onClick={() => setActiveSection('rechercher')}
               >
                 <Search size={18} className="mr-3" />
@@ -140,7 +137,7 @@ export default function FamTree() {
             </li>
             <li>
               <button 
-                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'analyser' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'analyser' ? 'bg-[#8BBDBD] text-white' : 'text-[#171717] hover:bg-[#8BBDBD] hover:bg-opacity-10'}`}
                 onClick={() => setActiveSection('analyser')}
               >
                 <Users size={18} className="mr-3" />
@@ -149,7 +146,7 @@ export default function FamTree() {
             </li>
             <li>
               <button 
-                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'parametres' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-blue-50'}`}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${activeSection === 'parametres' ? 'bg-[#8BBDBD] text-white' : 'text-[#171717] hover:bg-[#8BBDBD] hover:bg-opacity-10'}`}
                 onClick={() => setActiveSection('parametres')}
               >
                 <Settings size={18} className="mr-3" />
@@ -167,11 +164,11 @@ export default function FamTree() {
       {/* Zone centrale (à droite) */}
       <div className="flex-1 p-8">
         <header className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+          <h2 className="text-2xl font-bold text-[#171717] flex items-center">
             {getSectionIcon(activeSection)}
             <span className="ml-3">{getSectionTitle(activeSection)}</span>
           </h2>
-          <div className="h-1 w-24 bg-blue-600 mt-2 rounded-full"></div>
+          <div className="h-1 w-24 bg-[#8BBDBD] mt-2 rounded-full"></div>
         </header>
         
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
@@ -203,7 +200,7 @@ export default function FamTree() {
                   <h4 className="font-medium mb-2">Apparence</h4>
                   <div className="flex items-center">
                     <span className="mr-4">Thème:</span>
-                    <select className="border rounded-md px-3 py-2">
+                    <select className="border rounded-md px-3 py-2 focus:border-[#8BBDBD] focus:ring-[#8BBDBD]">
                       <option>Clair</option>
                       <option>Sombre</option>
                       <option>Système</option>
@@ -215,7 +212,7 @@ export default function FamTree() {
                   <h4 className="font-medium mb-2">Langue</h4>
                   <div className="flex items-center">
                     <span className="mr-4">Langue:</span>
-                    <select className="border rounded-md px-3 py-2">
+                    <select className="border rounded-md px-3 py-2 focus:border-[#8BBDBD] focus:ring-[#8BBDBD]">
                       <option>Français</option>
                       <option>English</option>
                       <option>Español</option>
@@ -225,7 +222,7 @@ export default function FamTree() {
                 
                 <div className="p-4 border border-gray-200 rounded-lg">
                   <h4 className="font-medium mb-2">Base de données</h4>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center">
+                  <button className="bg-[#8BBDBD] text-white px-4 py-2 rounded-md flex items-center hover:bg-[#7aa9a9]">
                     <Database size={16} className="mr-2" />
                     Exporter les données
                   </button>

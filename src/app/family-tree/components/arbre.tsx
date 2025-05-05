@@ -568,19 +568,19 @@ useEffect(() => {
           });
       }
       
-      // Ajouter photo avec clipPath amélioré pour tous les genres
-      const clipPathId = `clip-${person.id}`;
-      
-      // Créer un clipPath pour l'image adapté à la forme
-      node.append("defs")
-        .append("clipPath")
-        .attr("id", clipPathId)
-        .append(person.gender === 'female' ? "circle" : "rect")
-        .attr(person.gender === 'female' ? "r" : "width", person.gender === 'female' ? (nodeSize / 2 - 5) : (nodeSize - 10))
-        .attr(person.gender === 'female' ? "cx" : "x", person.gender === 'female' ? 0 : (-nodeSize / 2 + 5))
-        .attr(person.gender === 'female' ? "cy" : "y", person.gender === 'female' ? 0 : (-nodeSize / 2 + 5))
-        .attr("rx", person.gender === 'female' ? undefined : 10) // Coins arrondis pour les rectangles
-        .attr("ry", person.gender === 'female' ? undefined : 10); // Coins arrondis pour les rectangles
+// Ajouter photo avec clipPath amélioré pour tous les genres
+const clipPathId = `clip-${person.id}`;
+
+// Créer un clipPath pour l'image adapté à la forme
+node.append("defs")
+  .append("clipPath")
+  .attr("id", clipPathId)
+  .append(person.gender === 'female' ? "circle" : "rect")
+  .attr(person.gender === 'female' ? "r" : "width", person.gender === 'female' ? (nodeSize / 2 - 5) : (nodeSize - 10))
+  .attr(person.gender === 'female' ? "cx" : "x", person.gender === 'female' ? 0 : (-nodeSize / 2 + 5))
+  .attr(person.gender === 'female' ? "cy" : "y", person.gender === 'female' ? 0 : (-nodeSize / 2 + 5))
+  .attr("rx", person.gender === 'female' ? undefined : 10) // Coins arrondis pour les rectangles
+  .attr("ry", person.gender === 'female' ? undefined : 10); // Coins arrondis pour les rectangles
       
       // Ajouter l'image pour tous les genres si disponible
       if (person.imageUrl) {
