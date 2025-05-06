@@ -25,7 +25,7 @@ export const initDB = async (): Promise<IDBPDatabase<FamilyTreeDB>> => {
   if (db) return db;
 
   try {
-    db = await openDB<FamilyTreeDB>('family-tree-db', 1, {
+    db = await openDB<FamilyTreeDB>('[familyId]-db', 1, {
       upgrade(database) {
         // Create the persons store if it doesn't exist
         if (!database.objectStoreNames.contains('persons')) {

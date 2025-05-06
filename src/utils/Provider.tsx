@@ -67,7 +67,7 @@ function useLogin() {
         {
             try
             {
-                const response = await axios.get("http://localhost:8019/api/user", {headers: {"Authorization": `Bearer ${token}`}});
+                const response = await axios.get("http://localhost:8019/api/user",{headers: {"Authorization": `Bearer ${token}`}});
                 if (response.status === 200)
                 {
                     console.log(response.data);
