@@ -24,6 +24,8 @@ public class Family {
 
     private String familyName;
 
+    private String description;
+
     @JsonManagedReference("members")
     @ManyToMany
     @JoinTable(

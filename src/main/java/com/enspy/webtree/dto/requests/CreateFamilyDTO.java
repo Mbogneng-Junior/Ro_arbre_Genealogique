@@ -13,5 +13,6 @@ import java.util.List;
 public class CreateFamilyDTO {
     private String familyName;
     private String username;
+    private String description;
     private List<CreateRelationDTO> familyMembers;
 }

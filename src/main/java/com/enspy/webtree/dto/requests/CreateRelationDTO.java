@@ -11,8 +11,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CreateRelationDTO {
     private String sourceUsername;
-    private String targetUsername;
+    private CreateUserDto targetUser; // Optionnel si targetUsername est fourni
     private int poid;
-
+    private String targetUsername; // Optionnel si targetUser est fourni
     private UUID familyId;
 }

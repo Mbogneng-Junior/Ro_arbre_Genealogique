@@ -78,7 +78,11 @@ public class AuthenticationService {
             user.setFirstName(createUserDto.getFirstName());
             user.setLastName(createUserDto.getLastName());
             user.setUsername(username);
-            user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
+            if(createUserDto.getPassword() != null) {
+                user.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
+            } else {
+                user.setPassword(passwordEncoder.encode("000000"));
+            }
             user.setDateOfBirth(createUserDto.getDateOfBirth());
 
 
@@ -91,14 +95,8 @@ public class AuthenticationService {
 
                 response.setText("User created Successfully");
                 response.setValue("200");
-                Map<String, Object> userInfo = new HashMap<>();
-                userInfo.put("username", freshUser.getUsername());
-                userInfo.put("name1", freshUser.getFirstName());
-                userInfo.put("name2", freshUser.getLastName());
-                userInfo.put("id", freshUser.getId());
-                userInfo.put("password", createUserDto.getPassword()); // Mot de passe non encodé
 
-                response.setData(userInfo);
+                response.setData(freshUser);
                 return response;
             } else {
                 throw new RuntimeException("Could not retrieve saved user");

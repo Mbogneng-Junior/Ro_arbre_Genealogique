@@ -63,7 +63,7 @@ public class JWTService {
         final long currenttime = System.currentTimeMillis();
         long expiration = 0;
 
-        expiration = currenttime + 30 * 60 * 1000;// Un token de 30 min
+        expiration = currenttime + 3000 * 60 * 1000;// Un token de 30 min
 
         final Map<String, Object> claims = Map.of(
                 "hashId", "",

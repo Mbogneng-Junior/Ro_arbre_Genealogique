@@ -37,7 +37,7 @@ public class UserService implements UserDetailsService {
 
             Users user = userOpt.get();
             List<Family> families = user.getFamilies();
-            
+
             List<Map<String, String>> familyList = new ArrayList<>();
 
             for (Family family : families) {

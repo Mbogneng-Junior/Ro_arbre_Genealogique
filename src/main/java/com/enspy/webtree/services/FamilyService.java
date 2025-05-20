@@ -2,6 +2,7 @@ package com.enspy.webtree.services;
 
 import com.enspy.webtree.dto.requests.CreateFamilyDTO;
 import com.enspy.webtree.dto.requests.CreateRelationDTO;
+import com.enspy.webtree.dto.requests.CreateUserDto;
 import com.enspy.webtree.dto.responses.ApiResponse;
 import com.enspy.webtree.models.Family;
 import com.enspy.webtree.models.Relations;
@@ -22,12 +23,15 @@ public class FamilyService {
 
     public FamilyService(UserRepository userRepository,
                          FamilyRepository familyRepository,
+                         AuthenticationService authenticationService,
                          RelationRepository relationRepository) {
         this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
         this.familyRepository = familyRepository;
         this.relationRepository = relationRepository;
     }
 
+    private AuthenticationService authenticationService;
     private UserRepository userRepository;
     private RelationRepository relationRepository;
     private FamilyRepository familyRepository;
@@ -45,6 +49,9 @@ public class FamilyService {
         try {
             Family family = new Family();
             family.setFamilyName(createFamilyDTO.getFamilyName());
+            if(createFamilyDTO.getDescription() != null){
+                family.setDescription(createFamilyDTO.getDescription());
+            }
             family.addMember(user);
             Family saved  = familyRepository.save(family);
             response.setText("Family created successfully");
@@ -67,20 +74,80 @@ public class FamilyService {
 
     }
 
-    public ApiResponse addMember(CreateRelationDTO createRelationDTO){
+    public ApiResponse addMember(CreateRelationDTO createRelationDTO) {
+        ApiResponse response = new ApiResponse();
         Family family = familyRepository.findById(createRelationDTO.getFamilyId()).orElse(null);
-        if(family == null){
-            ApiResponse response = new ApiResponse();
+       Users userTarget;
+        if (family == null) {
+
             response.setText("Invalid family id");
             response.setValue("404");
             return response;
         }
+
         try {
-            Relations relations = createRelation(createRelationDTO);
-            return addMemberToFamily(relations, family);
-        } catch (Exception e){
-            ApiResponse response = new ApiResponse();
-            response.setText("an error occured :" + e.getMessage());
+            if(createRelationDTO.getTargetUsername() == null){
+              ApiResponse response2 =  authenticationService.createUser(createRelationDTO.getTargetUser());
+                if (!response2.getValue().equals("200")){
+                    return response2;
+                } else {
+                    userTarget = (Users) response2.getData();
+                }
+            } else {
+                userTarget = userRepository.findByUsername(createRelationDTO.getTargetUsername()).orElse(null);
+            }
+
+            Users userSource = userRepository.findByUsername(createRelationDTO.getSourceUsername()).orElse(null);
+
+
+            if (userSource == null || userTarget == null) {
+                response.setText("L'utilisateur Source ou l'utilisateur target n'éxiste pas");
+                response.setValue("404");
+                return response;
+            }
+
+            boolean sourceIsMember = userSource.getFamilies().stream()
+                    .anyMatch(f -> f.getId().equals(family.getId()));
+
+            if (!sourceIsMember) {
+
+                response.setValue("401");
+                response.setText("L'utilisateur Source n'est pas membre de la famille");
+                return response;
+            }
+
+            boolean targetIsAlreadyMember = userTarget.getFamilies().stream()
+                    .anyMatch(f -> f.getId().equals(family.getId()));
+
+            if (targetIsAlreadyMember) {
+
+                response.setValue("409");
+                response.setText("L'utilisateur targert est déja membre de la famille");
+                return response;
+            }
+
+
+            Relations relations = new Relations();
+            relations.setPoid(createRelationDTO.getPoid());
+            relations.setSources(userSource);
+            relations.setTarget(userTarget);
+
+
+            family.addMember(userTarget);
+            userTarget.addFamily(family);
+
+
+            relationRepository.save(relations);
+            userRepository.save(userTarget);
+            familyRepository.save(family);
+
+
+            response.setText("Nouveau membre ajouté avec success");
+            response.setValue("200");
+            return response;
+        } catch (Exception e) {
+
+            response.setText("An error occurred: " + e.getMessage());
             response.setValue("500");
             return response;
         }
