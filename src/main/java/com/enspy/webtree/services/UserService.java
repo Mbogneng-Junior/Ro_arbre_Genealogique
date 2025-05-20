@@ -37,22 +37,16 @@ public class UserService implements UserDetailsService {
 
             Users user = userOpt.get();
             List<Family> families = user.getFamilies();
+            
+            List<Map<String, String>> familyList = new ArrayList<>();
 
-
-            Map<String, Map<String, String>> familyList = new HashMap<>();
-
-            int count = 1;
             for (Family family : families) {
-
                 Map<String, String> familyMap = new HashMap<>();
                 familyMap.put("id", family.getId().toString());
                 familyMap.put("familyName", family.getFamilyName());
                 familyMap.put("numberOfMembers", String.valueOf(family.getMemberCount()));
-
-                familyList.put("family" + count, familyMap);
-                count++;
+                familyList.add(familyMap);
             }
-
 
             response.setData(familyList);
             response.setText("success");
@@ -65,6 +59,7 @@ public class UserService implements UserDetailsService {
             return response;
         }
     }
+
 
 
 
