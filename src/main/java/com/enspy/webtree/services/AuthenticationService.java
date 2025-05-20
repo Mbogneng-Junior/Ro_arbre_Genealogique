@@ -135,8 +135,8 @@ public class AuthenticationService {
         ApiResponse apiError = new ApiResponse();
         Map<String, Object> map = new HashMap<>();
         map.put("BearerInfos", jwtService.generateJWT(user));
-        map.put("username", user.getFirstName());
-        
+        map.put("username", user.getUsername());
+
         apiError.setData(map);
         apiError.setText("User Login successfully.");
         apiError.setValue("200");
