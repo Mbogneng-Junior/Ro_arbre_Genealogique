@@ -56,4 +56,8 @@ public class Family {
             familiesOfUser.add(this);
         }
     }
+
+    public int getMemberCount() {
+        return (members == null) ? 0 : members.size();
+    }
 }

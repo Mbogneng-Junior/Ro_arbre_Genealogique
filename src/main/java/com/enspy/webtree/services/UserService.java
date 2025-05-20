@@ -37,20 +37,35 @@ public class UserService implements UserDetailsService {
 
             Users user = userOpt.get();
             List<Family> families = user.getFamilies();
-            Map<String, String> familyMap = new HashMap<>();
+
+
+            Map<String, Map<String, String>> familyList = new HashMap<>();
+
+            int count = 1;
             for (Family family : families) {
-                familyMap.put(family.getId().toString(), family.getFamilyName());
+                
+                Map<String, String> familyMap = new HashMap<>();
+                familyMap.put("id", family.getId().toString());
+                familyMap.put("familyName", family.getFamilyName());
+                familyMap.put("numberOfMembers", String.valueOf(family.getMemberCount()));
+
+                familyList.put("family" + count, familyMap);
+                count++;
             }
-            response.setData(familyMap);
+
+
+            response.setData(familyList);
             response.setText("success");
             response.setValue("200");
             return response;
-        } catch (Exception e){
-            response.setText("an error occured :" + e.getMessage());
+
+        } catch (Exception e) {
+            response.setText("an error occurred: " + e.getMessage());
             response.setValue("500");
             return response;
         }
     }
+
 
 
 
