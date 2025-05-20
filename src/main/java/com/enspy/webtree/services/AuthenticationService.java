@@ -142,6 +142,34 @@ public class AuthenticationService {
         return apiError;
     }
 
+    public ApiResponse getUserInfo(String username){
+        ApiResponse response = new ApiResponse();
+        Optional<Users> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()){
+            response.setText("invalid username");
+            response.setValue("404");
+            return response;
+        }
+        Users user = userOpt.get();
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("firstName", user.getFirstName());
+            map.put("lastName", user.getLastName());
+            map.put("email", user.getEmail());
+            map.put("dateOfBirth", user.getDateOfBirth());
+
+
+            response.setData(map);
+            response.setText("User info");
+            response.setValue("200");
+            return response;
+        } catch (Exception e){
+            response.setText("an error occured :" + e.getMessage());
+            response.setValue("500");
+            return response;
+        }
+    }
+
     private ApiResponse generateFamilyToken(Family family){
         ApiResponse apiError = new ApiResponse();
         Map<String, Object> map = new HashMap<>();
