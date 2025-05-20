@@ -9,6 +9,7 @@ import com.enspy.webtree.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,9 +27,9 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(Integer.parseInt(response.getValue())));
     }
 
-    @PostMapping("/userFamilies")
-    public ResponseEntity<ApiResponse> getUserFamily(@RequestBody GetUserInfo userInfoDto) {
-        ApiResponse response = this.userService.getUserFamilies(userInfoDto.getUsername());
+    @GetMapping("/userFamilies/{username}")
+    public ResponseEntity<ApiResponse> getUserFamily(String username) {
+        ApiResponse response = this.userService.getUserFamilies(username);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(Integer.parseInt(response.getValue())));
     }
 }

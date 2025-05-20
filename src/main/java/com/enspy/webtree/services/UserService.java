@@ -43,7 +43,7 @@ public class UserService implements UserDetailsService {
 
             int count = 1;
             for (Family family : families) {
-                
+
                 Map<String, String> familyMap = new HashMap<>();
                 familyMap.put("id", family.getId().toString());
                 familyMap.put("familyName", family.getFamilyName());
