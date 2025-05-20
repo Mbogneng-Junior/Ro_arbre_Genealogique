@@ -38,6 +38,7 @@ public class Security {
                     auth
                             .requestMatchers("/register").permitAll()
                             .requestMatchers("/login").permitAll()
+                            .requestMatchers("/create_family").permitAll()
 
 
                             .anyRequest().authenticated();
