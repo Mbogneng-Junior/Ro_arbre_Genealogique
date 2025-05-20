@@ -154,6 +154,7 @@ public class AuthenticationService {
         Users user = userOpt.get();
         try {
             Map<String, Object> map = new HashMap<>();
+            map.put("id", user.getId());
             map.put("firstName", user.getFirstName());
             map.put("lastName", user.getLastName());
             map.put("email", user.getEmail());
