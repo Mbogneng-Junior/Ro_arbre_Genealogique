@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link"
 import { PlusCircle, Search, Filter, ChevronRight, Edit2, Trash2, Users } from "lucide-react"
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/global/Sidebar";
 import axiosInstance from "@/lib/axiosConfig/axiosInstance";
 import {useState} from "react";
 import {AxiosResponse} from "axios";
@@ -93,7 +93,7 @@ export default function FamiliesPage() {
                         <div className="flex h-16 items-center justify-between">
                             <h1 className="text-xl font-semibold text-gray-800">Mes familles</h1>
                             <Link
-                                href="/dashboard/families/new"
+                                href="/src/app/families/new"
                                 className="inline-flex items-center rounded-md bg-teal-500 px-4 py-2 text-sm font-medium text-white hover:bg-teal-600"
                             >
                                 <PlusCircle className="mr-2 h-4 w-4"/>
@@ -152,7 +152,7 @@ export default function FamiliesPage() {
                                 </div>
                                 <div className="flex border-t border-gray-200 bg-gray-50">
                                     <Link
-                                        href={`/dashboard/families/${family.id}`}
+                                        href={`/src/app/families/${family.id}`}
                                         className="flex flex-1 items-center justify-center py-3 text-sm font-medium text-teal-600 hover:bg-gray-100 hover:text-teal-700"
                                     >
                                         Voir
@@ -160,7 +160,7 @@ export default function FamiliesPage() {
                                     </Link>
                                     <div className="h-6 border-l border-gray-200 py-3"></div>
                                     <Link
-                                        href={`/dashboard/families/${family.id}/edit`}
+                                        href={`/src/app/families/${family.id}/edit`}
                                         className="flex flex-1 items-center justify-center py-3 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-700"
                                     >
                                         <Edit2 className="mr-1 h-4 w-4"/>
@@ -189,7 +189,7 @@ export default function FamiliesPage() {
                             <p className="mt-1 text-sm text-gray-500">Commencez par créer votre première famille.</p>
                             <div className="mt-6">
                                 <Link
-                                    href="/dashboard/families/new"
+                                    href="/src/app/families/new"
                                     className="inline-flex items-center rounded-md bg-teal-500 px-4 py-2 text-sm font-medium text-white hover:bg-teal-600"
                                 >
                                     <PlusCircle className="mr-2 h-4 w-4"/>

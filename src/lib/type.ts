@@ -31,3 +31,39 @@ export type LoginFormType = {
 export type AxiosLoginResponse={
     data:AxiosResponse<object>,
 }
+
+export type UserType = {
+    username: string,
+    id: string,
+    email: string
+    firstName: string,
+    lastName: string,
+    dateOfBirth: string
+}
+
+
+
+
+export type FamilyType = {
+    familyName: string,
+    id: string,
+    numberOfMembers: string
+}
+
+export interface FamilyMember {
+    id: string
+    name: string
+    birthDate: string
+    birthPlace: string
+    gender: "male" | "female" | "other"
+    role: "parent" | "child" | "other"
+    imageFile: File | null
+    imagePreview: string | null
+}
+
+export interface Family {
+    familyName: string,
+    description: string,
+    username?:string
+    members?: FamilyMember[]
+}

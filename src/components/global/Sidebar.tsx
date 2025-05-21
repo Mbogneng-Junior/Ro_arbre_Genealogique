@@ -13,7 +13,7 @@ export default function Sidebar(): JSX.Element
 
     function isActive (path: string): boolean
     {
-       return currentPath === path;
+       return currentPath.startsWith(path);
 
     }
 
@@ -54,17 +54,17 @@ export default function Sidebar(): JSX.Element
                         Tableau de bord
                     </Link>
                     <Link
-                        href="/dashboard/families"
-                        className={getLinkClasses('/dashboard/families')}
+                        href="/families"
+                        className={getLinkClasses('/families')}
                     >
-                        <Users className={getIconClasses('/dashboard/families')} />
+                        <Users className={getIconClasses('/families')} />
                         Mes familles
                     </Link>
                     <Link
-                        href="/dashboard/settings"
-                        className={getLinkClasses('/dashboard/settings')}
+                        href="/settings"
+                        className={getLinkClasses('/settings')}
                     >
-                        <Settings className={getIconClasses('/dashboard/settings')} />
+                        <Settings className={getIconClasses('/settings')} />
                         Paramètres
                     </Link>
                 </nav>

@@ -9,7 +9,7 @@ import {
     FamilyFormType,
     RegistrationFormType
 } from "@/lib/type";
-import axios, {AxiosError, AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
 
 
 export default function RegistrationForm() {
@@ -47,9 +47,10 @@ export default function RegistrationForm() {
         })
     }
 
-    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [errorMessage, setErrorMessage] = useState<string|null>(null);
     const [familyErrorMessage, setFamilyErrorMessage] = useState<string>("");
     const [userErrorMessage, setUserErrorMessage] = useState<string>("");
+
 
     function nextStep ():void
         {
@@ -61,22 +62,22 @@ export default function RegistrationForm() {
             else {
                 setErrorMessage("veuillez remplir tous les champs");
             }
-
-
     }
+
 
     function prevStep ():void
     {
         setStep(step - 1)
     }
 
+
     async function handleSubmit(e: React.FormEvent): Promise<void> {
         e.preventDefault();
         console.log("Form submitted:", formData);
         console.log("Family form submitted:", familyForm);
+        setErrorMessage(null);
         try {
             const response: AxiosResponse<AxiosRegistrationResponse> = await axios.post("http://localhost:8019/api/register", formData);
-            setErrorMessage("");
             let familySuccess = true;
             if (createFamily)
             {
@@ -88,7 +89,7 @@ export default function RegistrationForm() {
                 catch (error)
                 {
                     console.log(error)
-                    setFamilyErrorMessage("Une erreur est survenue lors de la création de votre famille, veuillez réessayer plutard!!")
+                    setErrorMessage("Une erreur est survenue lors de la création de votre famille, veuillez réessayer plutard!!")
                 }
               
             }
@@ -108,9 +109,9 @@ export default function RegistrationForm() {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
+            {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
             {step === 1 && (
                 <div className="space-y-4">
-                    {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                     <div className="flex flex-col space-y-1">
                         <label htmlFor="firstName" className="text-sm font-medium text-gray-700">
                             Nom

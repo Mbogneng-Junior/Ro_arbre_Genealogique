@@ -5,7 +5,7 @@ import errorInterceptor from "./interceptors/error-interceptor";
 
 
 const axiosInstance: AxiosInstance = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: "http://localhost:8019/api",
 });
 
 authInterceptor(axiosInstance);

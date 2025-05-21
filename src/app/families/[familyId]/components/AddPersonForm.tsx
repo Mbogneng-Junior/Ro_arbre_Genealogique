@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { UserPlus, UserMinus, User, Users, Heart, Upload, X, Trash2, AlertCircle, CalendarIcon } from 'lucide-react';
 import { Person, Relationship } from '../lib/types';
 

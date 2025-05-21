@@ -2,7 +2,7 @@
 import constate from "constate";
 import {useEffect, useMemo, useState} from "react";
 import axios, {AxiosResponse} from "axios";
-import {LoginFormType} from "@/lib/type";
+import {LoginFormType, UserType} from "@/lib/type";
 
 
 
@@ -16,17 +16,19 @@ function useLogin() {
 
     const [isLogged, setIsLogged] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [userData, setUserData] = useState({});
+    const [userData, setUserData] = useState<UserType|null>(null);
 
 
-    function saveAuthParameters(token: string) {
+    function saveAuthParameters(token: string, username:string) {
         localStorage.setItem("family_tree_token", token);
+        localStorage.setItem("username", username)
     }
 
 
     function clearLocalStorage()
     {
         localStorage.removeItem("family_tree_token");
+        localStorage.removeItem("username");
     }
 
 
@@ -40,8 +42,8 @@ function useLogin() {
             {
                 setIsLoading(false);
                 console.log("logged user data: ",response);
-                saveAuthParameters(response.data.data.BearerInfos.Bearer);
-               // setUserData(response.data.user);
+                saveAuthParameters(response.data.data.BearerInfos.Bearer, response?.data.data.username);
+                setUserData(response.data.user);
                 await getCurrentUserInfos();
                 return response.status;
             }
@@ -65,14 +67,22 @@ function useLogin() {
         const token = localStorage.getItem("family_tree_token");
         if (token)
         {
+            const username = localStorage.getItem("username") as string;
+            if(username === null || username === undefined || username=="")
+            {
+                throw new Error("Username not found in local storage");
+            }
+            const data = {
+                username: username
+            }
             try
             {
-                const response = await axios.get("http://localhost:8019/api/user",{headers: {"Authorization": `Bearer ${token}`}});
+                const response = await axios.post("http://localhost:8019/api/getUserInfo",data, {headers: {"Authorization": `Bearer ${token}`}});
                 if (response.status === 200)
                 {
-                    console.log(response.data);
+                    console.log(response?.data);
                     setIsLogged(true);
-                    setUserData(response.data);
+                    setUserData(response?.data?.data);
                 }
             }
             catch (error)
@@ -96,7 +106,7 @@ function useLogin() {
         else
         {
             setIsLogged(false);
-            setUserData({});
+            setUserData(null);
             clearLocalStorage();
         }
     }, []);
@@ -109,7 +119,7 @@ function useLogin() {
     {
         clearLocalStorage();
         setIsLogged(false);
-        setUserData({});
+        setUserData(null);
         window.location.href="/";
     }
 
