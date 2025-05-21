@@ -57,7 +57,7 @@ export default function FinalStep({familyName, familyDescription, members, prevS
                                             {member.imagePreview ? (
                                                 <img
                                                     src={member.imagePreview || "/placeholder.svg"}
-                                                    alt={member.name}
+                                                    alt={member.firstName}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
@@ -65,7 +65,7 @@ export default function FinalStep({familyName, familyDescription, members, prevS
                                             )}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">{member.name}</p>
+                                            <p className="text-sm font-medium text-gray-900">{member.firstName}</p>
                                             <p className="text-xs text-gray-500">
                                                 {member.role === "parent" ? "Parent" : member.role === "child" ? "Enfant" : "Autre"}
                                             </p>

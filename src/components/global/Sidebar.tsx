@@ -41,7 +41,7 @@ export default function Sidebar(): JSX.Element
 
     return (
         <div className="hidden w-64 flex-shrink-0 border-r border-gray-200 bg-white md:flex md:flex-col">
-            <div onClick={()=> router.push("/")} className="cursor-pointer flex h-16 items-center justify-center border-b border-gray-200">
+            <div onClick={()=> router.push("/dashboard")} className="cursor-pointer flex h-16 items-center justify-center border-b border-gray-200">
                 <h1 className="text-xl font-semibold text-teal-600">Family Tree App</h1>
             </div>
             <div className="flex flex-1 flex-col overflow-y-auto">

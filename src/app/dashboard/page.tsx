@@ -19,18 +19,16 @@ export default function Dashboard() {
 
 
 
-    async function retrieveAllFamilies(username: string)
-    {
+    async function retrieveAllFamilies(username: string) {
         try {
             const response = await axiosInstance.get(`/userFamilies/${username}`);
             console.log(response?.data);
-            setUserFamilies(response?.data?.data);
+            const limitedFamilies = response?.data?.data.slice(0, 3);
+            setUserFamilies(limitedFamilies);
             setErrorMessage(null);
-        } catch (error)
-        {
-            setErrorMessage("Quelque chose a mal tourne durant la recuperation de la liste de vos familles, veuillez reessayer plutard");
+        } catch (error) {
+            setErrorMessage("Quelque chose a mal tourné durant la récupération de la liste de vos familles, veuillez réessayer plus tard");
             console.log(error);
-
         }
     }
 

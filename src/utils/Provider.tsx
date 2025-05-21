@@ -117,7 +117,8 @@ function useLogin() {
 
     function logout()
     {
-        clearLocalStorage();
+        localStorage.clear();
+       // clearLocalStorage();
         setIsLogged(false);
         setUserData(null);
         window.location.href="/";
@@ -132,6 +133,6 @@ function useLogin() {
         isLogged,
         login,
         logout,
-    }), [isLoading, userData, isLogged, login]);
+    }), [isLoading, userData, isLogged]);
     return {authMethods}
 }

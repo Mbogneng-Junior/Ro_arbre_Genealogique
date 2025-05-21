@@ -52,11 +52,13 @@ export type FamilyType = {
 
 export interface FamilyMember {
     id: string
-    name: string
-    birthDate: string
+    firstName: string,
+    lastName?: string,
+    dateOfBirth: string
     birthPlace: string
-    gender: "male" | "female" | "other"
-    role: "parent" | "child" | "other"
+    gender: "homme" | "femme",
+    role: "parent" | "enfant",
+    email?:string,
     imageFile: File | null
     imagePreview: string | null
 }

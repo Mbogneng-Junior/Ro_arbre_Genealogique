@@ -32,7 +32,6 @@ export default function AddFamilyMemberStep({currentMember, addMember, handleMem
                                     alt="Preview"
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
-                                        // Fallback en cas d'erreur avec l'image
                                         e.currentTarget.src = "/placeholder.svg";
                                     }}
                                 />
@@ -43,7 +42,8 @@ export default function AddFamilyMemberStep({currentMember, addMember, handleMem
                         <label
                             className="absolute bottom-0 right-0 bg-[#8BBDBD] rounded-full p-2 cursor-pointer hover:bg-[#7AACAC] transition-colors">
                             <Upload size={16} className="text-white"/>
-                            <input type="file" accept="image/*" className="hidden" onChange={handleImageChange}/>
+                            <input type="file" accept="image/*" className="hidden"
+                                   onChange={handleImageChange}/>
                         </label>
                     </div>
                 </div>
@@ -51,19 +51,35 @@ export default function AddFamilyMemberStep({currentMember, addMember, handleMem
                 {/* Nom */}
                 <div className="md:col-span-2">
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                        Nom complet *
+                        Nom *
                     </label>
                     <input
-                        id="name"
-                        name="name"
+                        id="firstName"
+                        name="firstName"
                         type="text"
                         required
-                        value={currentMember.name}
+                        value={currentMember.firstName}
                         onChange={handleMemberChange}
                         placeholder="Prénom NOM"
                         className="block w-full rounded-md  border-gray-400 border-2 py-2 px-3 shadow-sm sm:text-sm focus:border-primary focus:border-2 focus:outline-none"
                     />
                 </div>
+
+                <div className="md:col-span-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                         Prenom
+                    </label>
+                    <input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        value={currentMember.lastName}
+                        onChange={handleMemberChange}
+                        placeholder="Prénom NOM"
+                        className="block w-full rounded-md  border-gray-400 border-2 py-2 px-3 shadow-sm sm:text-sm focus:border-primary focus:border-2 focus:outline-none"
+                    />
+                </div>
+
 
                 {/* Date de naissance*/}
                 <div>
@@ -72,10 +88,10 @@ export default function AddFamilyMemberStep({currentMember, addMember, handleMem
                     </label>
                     <div className="relative">
                         <input
-                            id="birthDate"
-                            name="birthDate"
+                            id="dateOfBirth"
+                            name="dateOfBirth"
                             type="date"
-                            value={currentMember.birthDate}
+                            value={currentMember.dateOfBirth}
                             onChange={handleMemberChange}
                             className="pl-10 block w-full rounded-md  border-gray-400 border-2 py-2 px-3 shadow-sm sm:text-sm focus:border-primary focus:border-2 focus:outline-none"
                         />
@@ -114,13 +130,13 @@ export default function AddFamilyMemberStep({currentMember, addMember, handleMem
                     <select
                         id="gender"
                         name="gender"
+                        required
                         value={currentMember.gender}
                         onChange={handleChange}
                         className="block w-full rounded-md  border-gray-400 border-2 py-2 px-3 shadow-sm sm:text-sm focus:border-primary focus:border-2 focus:outline-none"
                     >
                         <option value="male">Homme</option>
                         <option value="female">Femme</option>
-                        <option value="other">Autre</option>
                     </select>
                 </div>
 
@@ -132,13 +148,13 @@ export default function AddFamilyMemberStep({currentMember, addMember, handleMem
                     <select
                         id="role"
                         name="role"
+                        required
                         value={currentMember.role}
                         onChange={handleChangeRole}
                         className="block w-full rounded-md  border-gray-400 border-2 py-2 px-3 shadow-sm sm:text-sm focus:border-primary focus:border-2 focus:outline-none"
                     >
                         <option value="parent">Parent</option>
                         <option value="child">Enfant</option>
-                        <option value="other">Autre</option>
                     </select>
                 </div>
 
@@ -153,7 +169,7 @@ export default function AddFamilyMemberStep({currentMember, addMember, handleMem
                     </button>
                     <button
                         type="submit"
-                        disabled={!currentMember.name}
+                        disabled={!currentMember.firstName && !currentMember.role && !currentMember.gender}
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#8BBDBD] hover:bg-[#7AACAC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8BBDBD] disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
                         Ajouter
