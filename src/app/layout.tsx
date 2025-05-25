@@ -5,10 +5,6 @@ import { Providers } from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
-  title: 'Tri Automatique des Prunes',
-  description: 'Application web pour le tri automatique des prunes - JCIA Hackathon 2025',
-};
 
 export default function RootLayout({
   children,
