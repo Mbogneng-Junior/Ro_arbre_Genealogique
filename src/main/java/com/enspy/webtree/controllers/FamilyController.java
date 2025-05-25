@@ -6,17 +6,19 @@ import com.enspy.webtree.dto.requests.CreateRelationDTO;
 import com.enspy.webtree.dto.requests.CreateUserDto;
 import com.enspy.webtree.dto.responses.ApiResponse;
 import com.enspy.webtree.services.FamilyService;
+import com.enspy.webtree.services.GraphLogicServices;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
 public class FamilyController {
     private FamilyService familyService;
+    private GraphLogicServices graphLogicServices;
 
     @PostMapping("/create_family")
     public ResponseEntity<ApiResponse> register(@RequestBody CreateFamilyDTO createFamilyDTO) {
@@ -27,6 +29,12 @@ public class FamilyController {
     @PostMapping("/add_member")
     public ResponseEntity<ApiResponse> addMember(@RequestBody CreateRelationDTO createRelationDTO) {
         ApiResponse response = this.familyService.addMember(createRelationDTO);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(Integer.parseInt(response.getValue())));
+    }
+
+    @GetMapping("/tree/{familyId}")
+    public ResponseEntity<ApiResponse> addMember(@PathVariable UUID familyId) {
+        ApiResponse response = this.graphLogicServices.familyTree(familyId);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(Integer.parseInt(response.getValue())));
     }
 }
