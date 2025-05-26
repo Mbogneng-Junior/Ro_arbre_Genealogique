@@ -78,6 +78,7 @@ public class FamilyService {
         ApiResponse response = new ApiResponse();
         Family family = familyRepository.findById(createRelationDTO.getFamilyId()).orElse(null);
        Users userTarget;
+       Users userSource;
         if (family == null) {
 
             response.setText("Invalid family id");
@@ -86,6 +87,21 @@ public class FamilyService {
         }
 
         try {
+            if(createRelationDTO.getTargetUsername() == null && createRelationDTO.getSourceUsername() == null){
+                response.setText("Un des membre ajouté dois etre obligatoirement memebre de la famille");
+                response.setValue("400");
+                return response;
+            }
+            if(createRelationDTO.getSourceUsername() == null){
+                ApiResponse response1 = authenticationService.createUser(createRelationDTO.getSourceUser());
+                if (!response1.getValue().equals("200")){
+                    return response1;
+                } else {
+                    userSource = (Users) response1.getData();
+                }
+            } else {
+                userSource = userRepository.findByUsername(createRelationDTO.getSourceUsername()).orElse(null);
+            }
             if(createRelationDTO.getTargetUsername() == null){
               ApiResponse response2 =  authenticationService.createUser(createRelationDTO.getTargetUser());
                 if (!response2.getValue().equals("200")){
@@ -96,8 +112,6 @@ public class FamilyService {
             } else {
                 userTarget = userRepository.findByUsername(createRelationDTO.getTargetUsername()).orElse(null);
             }
-
-            Users userSource = userRepository.findByUsername(createRelationDTO.getSourceUsername()).orElse(null);
 
 
             if (userSource == null || userTarget == null) {
