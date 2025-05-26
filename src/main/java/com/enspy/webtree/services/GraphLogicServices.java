@@ -319,6 +319,308 @@ public class GraphLogicServices {
             this.distance = distance;
         }
     }
+
+
+    // ========================================================================
+    // ALGORITHME DE BELLMAN-FORD
+    // ========================================================================
+
+    /**
+     * Implémentation de l'algorithme de Bellman-Ford pour détecter les cycles
+     * et trouver les chemins les plus courts avec poids négatifs
+     */
+    @Transactional(readOnly = true)
+    public ApiResponse bellmanFord(UUID familyId, String sourceUsername) {
+        ApiResponse response = new ApiResponse();
+
+        try {
+            Family family = familyRepository.findById(familyId)
+                    .orElseThrow(() -> new NoSuchElementException("Famille non trouvée"));
+
+            List<Users> familyMembers = family.getMembers();
+            List<Relations> allRelations = relationRepository
+                    .findAllBySourcesInAndTargetIn(familyMembers, familyMembers);
+
+            // Initialisation
+            Map<String, Integer> distances = new HashMap<>();
+            Map<String, String> predecessors = new HashMap<>();
+
+            for (Users user : familyMembers) {
+                distances.put(user.getUsername(), Integer.MAX_VALUE);
+            }
+            distances.put(sourceUsername, 0);
+
+            // Relaxation des arêtes (V-1) fois
+            for (int i = 0; i < familyMembers.size() - 1; i++) {
+                for (Relations relation : allRelations) {
+                    String sourceUser = relation.getSources().getUsername();
+                    String targetUser = relation.getTarget().getUsername();
+                    int weight = relation.getPoid();
+
+                    if (distances.get(sourceUser) != Integer.MAX_VALUE &&
+                            distances.get(sourceUser) + weight < distances.get(targetUser)) {
+                        distances.put(targetUser, distances.get(sourceUser) + weight);
+                        predecessors.put(targetUser, sourceUser);
+                    }
+                }
+            }
+
+            // Détection de cycles négatifs
+            boolean hasNegativeCycle = false;
+            for (Relations relation : allRelations) {
+                String sourceUser = relation.getSources().getUsername();
+                String targetUser = relation.getTarget().getUsername();
+                int weight = relation.getPoid();
+
+                if (distances.get(sourceUser) != Integer.MAX_VALUE &&
+                        distances.get(sourceUser) + weight < distances.get(targetUser)) {
+                    hasNegativeCycle = true;
+                    break;
+                }
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("distances", distances);
+            result.put("predecessors", predecessors);
+            result.put("hasNegativeCycle", hasNegativeCycle);
+            result.put("sourceUsername", sourceUsername);
+
+            response.setData(result);
+            response.setText("Algorithme Bellman-Ford exécuté avec succès");
+            response.setValue("200");
+
+        } catch (Exception e) {
+            response.setText("Erreur lors de l'exécution de Bellman-Ford: " + e.getMessage());
+            response.setValue("500");
+        }
+
+        return response;
+    }
+
+    // ========================================================================
+    // ALGORITHME DE PRIM
+    // ========================================================================
+
+    /**
+     * Implémentation de l'algorithme de Prim pour trouver l'arbre couvrant minimal
+     */
+    @Transactional(readOnly = true)
+    public ApiResponse primMST(UUID familyId) {
+        ApiResponse response = new ApiResponse();
+
+        try {
+            Family family = familyRepository.findById(familyId)
+                    .orElseThrow(() -> new NoSuchElementException("Famille non trouvée"));
+
+            List<Users> familyMembers = family.getMembers();
+            List<Relations> allRelations = relationRepository
+                    .findAllBySourcesInAndTargetIn(familyMembers, familyMembers);
+
+            if (familyMembers.isEmpty()) {
+                response.setText("Aucun membre dans la famille");
+                response.setValue("404");
+                return response;
+            }
+
+            // Structure pour l'algorithme de Prim
+            Set<String> visited = new HashSet<>();
+            List<Edge> mstEdges = new ArrayList<>();
+            PriorityQueue<Edge> priorityQueue = new PriorityQueue<>(
+                    Comparator.comparingInt(e -> e.weight)
+            );
+
+            // Commencer avec le premier membre
+            String startVertex = familyMembers.get(0).getUsername();
+            visited.add(startVertex);
+
+            // Ajouter toutes les arêtes du sommet de départ
+            addEdgesToQueue(startVertex, allRelations, priorityQueue, visited);
+
+            while (!priorityQueue.isEmpty() && visited.size() < familyMembers.size()) {
+                Edge minEdge = priorityQueue.poll();
+
+                if (visited.contains(minEdge.target)) {
+                    continue; // Éviter les cycles
+                }
+
+                // Ajouter l'arête à l'MST
+                mstEdges.add(minEdge);
+                visited.add(minEdge.target);
+
+                // Ajouter les nouvelles arêtes
+                addEdgesToQueue(minEdge.target, allRelations, priorityQueue, visited);
+            }
+
+            // Calculer le poids total
+            int totalWeight = mstEdges.stream().mapToInt(e -> e.weight).sum();
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("mstEdges", mstEdges);
+            result.put("totalWeight", totalWeight);
+            result.put("numberOfVertices", visited.size());
+            result.put("isConnected", visited.size() == familyMembers.size());
+
+            response.setData(result);
+            response.setText("Arbre couvrant minimal calculé avec succès");
+            response.setValue("200");
+
+        } catch (Exception e) {
+            response.setText("Erreur lors du calcul de l'MST: " + e.getMessage());
+            response.setValue("500");
+        }
+
+        return response;
+    }
+
+    // ========================================================================
+    // ALGORITHME DE KRUSKAL
+    // ========================================================================
+
+    /**
+     * Implémentation de l'algorithme de Kruskal pour partitionner en sous-familles
+     */
+    @Transactional(readOnly = true)
+    public ApiResponse kruskalMST(UUID familyId) {
+        ApiResponse response = new ApiResponse();
+
+        try {
+            Family family = familyRepository.findById(familyId)
+                    .orElseThrow(() -> new NoSuchElementException("Famille non trouvée"));
+
+            List<Users> familyMembers = family.getMembers();
+            List<Relations> allRelations = relationRepository
+                    .findAllBySourcesInAndTargetIn(familyMembers, familyMembers);
+
+            // Convertir en liste d'arêtes
+            List<Edge> edges = allRelations.stream()
+                    .map(relation -> new Edge(
+                            relation.getSources().getUsername(),
+                            relation.getTarget().getUsername(),
+                            relation.getPoid()
+                    ))
+                    .sorted(Comparator.comparingInt(e -> e.weight))
+                    .collect(Collectors.toList());
+
+            // Structure Union-Find
+            UnionFind unionFind = new UnionFind(familyMembers);
+            List<Edge> mstEdges = new ArrayList<>();
+
+            for (Edge edge : edges) {
+                if (unionFind.find(edge.source) != unionFind.find(edge.target)) {
+                    unionFind.union(edge.source, edge.target);
+                    mstEdges.add(edge);
+                }
+            }
+
+            // Identifier les composantes connexes (sous-familles)
+            Map<String, List<String>> subFamilies = unionFind.getComponents();
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("mstEdges", mstEdges);
+            result.put("subFamilies", subFamilies);
+            result.put("numberOfSubFamilies", subFamilies.size());
+            result.put("totalWeight", mstEdges.stream().mapToInt(e -> e.weight).sum());
+
+            response.setData(result);
+            response.setText("Partitionnement en sous-familles réalisé avec succès");
+            response.setValue("200");
+
+        } catch (Exception e) {
+            response.setText("Erreur lors du partitionnement: " + e.getMessage());
+            response.setValue("500");
+        }
+
+        return response;
+    }
+
+    // ========================================================================
+    // CLASSES UTILITAIRES
+    // ========================================================================
+
+    private void addEdgesToQueue(String vertex, List<Relations> relations,
+                                 PriorityQueue<Edge> queue, Set<String> visited) {
+        for (Relations relation : relations) {
+            if (relation.getSources().getUsername().equals(vertex)) {
+                String target = relation.getTarget().getUsername();
+                if (!visited.contains(target)) {
+                    queue.offer(new Edge(vertex, target, relation.getPoid()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Classe représentant une arête
+     */
+    public static class Edge {
+        public String source;
+        public String target;
+        public int weight;
+
+        public Edge(String source, String target, int weight) {
+            this.source = source;
+            this.target = target;
+            this.weight = weight;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("(%s -> %s, poids: %d)", source, target, weight);
+        }
+    }
+
+    /**
+     * Structure Union-Find pour l'algorithme de Kruskal
+     */
+    public static class UnionFind {
+        private Map<String, String> parent;
+        private Map<String, Integer> rank;
+
+        public UnionFind(List<Users> vertices) {
+            parent = new HashMap<>();
+            rank = new HashMap<>();
+
+            for (Users user : vertices) {
+                parent.put(user.getUsername(), user.getUsername());
+                rank.put(user.getUsername(), 0);
+            }
+        }
+
+        public String find(String vertex) {
+            if (!parent.get(vertex).equals(vertex)) {
+                parent.put(vertex, find(parent.get(vertex))); // Compression de chemin
+            }
+            return parent.get(vertex);
+        }
+
+        public void union(String vertex1, String vertex2) {
+            String root1 = find(vertex1);
+            String root2 = find(vertex2);
+
+            if (!root1.equals(root2)) {
+                // Union par rang
+                if (rank.get(root1) < rank.get(root2)) {
+                    parent.put(root1, root2);
+                } else if (rank.get(root1) > rank.get(root2)) {
+                    parent.put(root2, root1);
+                } else {
+                    parent.put(root2, root1);
+                    rank.put(root1, rank.get(root1) + 1);
+                }
+            }
+        }
+
+        public Map<String, List<String>> getComponents() {
+            Map<String, List<String>> components = new HashMap<>();
+
+            for (String vertex : parent.keySet()) {
+                String root = find(vertex);
+                components.computeIfAbsent(root, k -> new ArrayList<>()).add(vertex);
+            }
+
+            return components;
+        }
+    }
 }
 
 
