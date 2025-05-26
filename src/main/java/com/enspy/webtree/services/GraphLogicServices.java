@@ -11,6 +11,7 @@ import com.enspy.webtree.repositories.FamilyRepository;
 import com.enspy.webtree.repositories.RelationRepository;
 import com.enspy.webtree.repositories.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -165,4 +166,159 @@ public class GraphLogicServices {
 
         return node;
     }
+
+
+    /**
+     * plus court chemin
+     */
+
+    @Transactional(readOnly = true)
+    public List<TreeNodeDTO> findPathDijkstra(UUID familyId, String usernameSource, String usernameTarget) {
+        Family family = familyRepository.findById(familyId)
+                .orElseThrow(() -> new NoSuchElementException("Famille non trouvée avec l'ID : " + familyId));
+
+        List<Users> familyMembers = family.getMembers();
+        if (familyMembers == null || familyMembers.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Users userSource = familyMembers.stream()
+                .filter(u -> u.getUsername().equals(usernameSource))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Utilisateur source non trouvé : " + usernameSource));
+
+        Users userTarget = familyMembers.stream()
+                .filter(u -> u.getUsername().equals(usernameTarget))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Utilisateur cible non trouvé : " + usernameTarget));
+
+        if (userSource.getUsername().equals(userTarget.getUsername())) { // Comparaison par username
+            return Collections.singletonList(buildNodeFromUser(userSource));
+        }
+
+        Map<String, UserGraphBuilder> userGraph = buildUserGraph(familyMembers);
+
+        List<Relations> allRelations = relationRepository.findAllBySourcesInAndTargetIn(familyMembers, familyMembers);
+
+        Set<String> familyMemberUsernames = familyMembers.stream().map(Users::getUsername).collect(Collectors.toSet());
+
+        for (Relations rel : allRelations) { // Itérer sur toutes les relations
+            String sourceUsername = rel.getSources().getUsername();
+            String targetUsername = rel.getTarget().getUsername();
+
+            // S'assurer que les deux membres de la relation sont dans la famille concernée
+            if (familyMemberUsernames.contains(sourceUsername) && familyMemberUsernames.contains(targetUsername)) {
+                UserGraphBuilder sourceNode = userGraph.get(sourceUsername);
+                UserGraphBuilder targetNode = userGraph.get(targetUsername);
+
+                if (sourceNode == null || targetNode == null) continue;
+
+                if (rel.getPoid() == 1) { // Parent-enfant
+                    sourceNode.getChildrenUsername().add(targetUsername); // Utilise username du voisin
+                    targetNode.getParentUsername().add(sourceUsername); // Utilise username du voisin
+                } else if (rel.getPoid() == 0) { // Conjoint/Partenaire
+                    sourceNode.getPartnerUsername().add(targetUsername); // Utilise username du voisin
+                    targetNode.getPartnerUsername().add(sourceUsername); // Utilise username du voisin
+                }
+            }
+        }
+
+        // 2. Implémentation de l'algorithme de Dijkstra
+        Map<String, Integer> distances = new HashMap<>(); // Clé est String (username)
+        Map<String, String> previousNodes = new HashMap<>(); // Clé est String (username), Valeur est String (username)
+        PriorityQueue<NodeDistance> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(nd -> nd.distance));
+
+        // Initialisation
+        for (String username : userGraph.keySet()) { // Parcourir les usernames
+            distances.put(username, Integer.MAX_VALUE);
+        }
+        distances.put(userSource.getUsername(), 0); // Utilise username de la source
+        priorityQueue.offer(new NodeDistance(userSource.getUsername(), 0)); // Utilise username de la source
+
+        String foundTargetUsername = null; // Cible trouvée par username
+
+        while (!priorityQueue.isEmpty()) {
+            NodeDistance current = priorityQueue.poll();
+            String currentUsername = current.nodeId; // NodeDistance stocke maintenant un String
+            int currentDistance = current.distance;
+
+            if (currentDistance > distances.get(currentUsername)) {
+                continue;
+            }
+
+            if (currentUsername.equals(userTarget.getUsername())) { // Comparaison par username
+                foundTargetUsername = currentUsername;
+                break; // Chemin trouvé !
+            }
+
+            UserGraphBuilder currentNode = userGraph.get(currentUsername);
+            if (currentNode == null) continue;
+
+            // Obtenir tous les voisins (parents, enfants, partenaires) par username
+            Set<String> neighbors = new HashSet<>();
+            neighbors.addAll(currentNode.getParentUsername());
+            neighbors.addAll(currentNode.getChildrenUsername());
+            neighbors.addAll(currentNode.getPartnerUsername());
+
+            for (String neighborUsername : neighbors) {
+                int newDistance = currentDistance + 1; // Coût de 1 pour chaque relation
+
+                if (newDistance < distances.getOrDefault(neighborUsername, Integer.MAX_VALUE)) {
+                    distances.put(neighborUsername, newDistance);
+                    previousNodes.put(neighborUsername, currentUsername); // Enregistrer le chemin
+                    priorityQueue.offer(new NodeDistance(neighborUsername, newDistance));
+                }
+            }
+        }
+
+        // 3. Reconstruction et formatage du chemin
+        if (foundTargetUsername == null) {
+            return Collections.emptyList(); // Pas de chemin trouvé
+        }
+
+        List<String> pathUsernames = new ArrayList<>(); // Liste d'usernames pour le chemin
+        String currentPathUsername = foundTargetUsername;
+        while (currentPathUsername != null) {
+            pathUsernames.add(currentPathUsername);
+            currentPathUsername = previousNodes.get(currentPathUsername);
+        }
+        Collections.reverse(pathUsernames); // Inverser pour avoir source -> cible
+
+        // Convertir les usernames du chemin en TreeNodeDTOs
+        return pathUsernames.stream()
+                .map(username -> buildNodeFromUser(userGraph.get(username).getUser()))
+                .collect(Collectors.toList());
+    }
+
+    // --- Fin de la méthode findShortestPathWithDijkstra ---
+
+
+    private Map<String, UserGraphBuilder> buildUserGraph(List<Users> familyMembers) {
+        Map<String, UserGraphBuilder> userGraph = new HashMap<>();
+        familyMembers.forEach(member -> userGraph.put(member.getUsername(), new UserGraphBuilder(member))); // Clé est username
+        return userGraph;
+    }
+
+    private TreeNodeDTO buildNodeFromUser(Users user) {
+        return TreeNodeDTO.builder()
+                .id(user.getId())
+                .name(user.getFirstName() + " " + user.getLastName()) // Utilise nom complet
+                .username(user.getUsername())
+                .childrens(Collections.emptyList())
+                .partners(Collections.emptyList())
+                .build();
+    }
+
+    // Classe interne pour la priorité de Dijkstra, maintenant avec String pour l'username
+    private static class NodeDistance {
+        String nodeId; // Changé de UUID à String (username)
+        int distance;
+
+        public NodeDistance(String nodeId, int distance) {
+            this.nodeId = nodeId;
+            this.distance = distance;
+        }
+    }
 }
+
+
