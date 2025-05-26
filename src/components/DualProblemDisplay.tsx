@@ -14,13 +14,13 @@ interface ProblemData {
   interface DualProblemDisplayProps {
     problemData: ProblemData;
     onBackToPrimalConfig: () => void;
-    // onSolveDual: () => void; // Décommenter et utiliser quand vous implémenterez la résolution du dual
+    onSolveDual: () => void; // Décommenter et utiliser quand vous implémenterez la résolution du dual
   }
   
   export default function DualProblemDisplay({
     problemData,
     onBackToPrimalConfig,
-    // onSolveDual,
+    onSolveDual,
   }: DualProblemDisplayProps) {
     const {
       objective,
@@ -100,18 +100,14 @@ interface ProblemData {
   
         {/* Espace pour la méthode de résolution du dual (à venir) */}
         <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-            <p className="text-gray-500 italic mb-4">
-              (La résolution du problème dual sera implémentée ultérieurement)
-            </p>
-          {/*
-          <button
-            onClick={onSolveDual} // Décommenter quand prêt
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-150 ease-in-out text-base"
-          >
-            Résoudre le Problème Dual
-          </button>
-          */}
-        </div>
+        <button
+          onClick={onSolveDual} // Utiliser la prop
+          className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-150 ease-in-out text-base"
+        >
+          Résoudre le Problème Dual (via Transformation)
+        </button>
+      </div>
+
   
         <div className="pt-4 text-center">
           <button
